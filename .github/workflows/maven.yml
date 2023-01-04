@@ -18,6 +18,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      TELEGRAM_BOT_TOKEN : ${{secrets.TELEGRAM_BOT_TOKEN}}
+      TELEGRAM_BOT_USERNAME : ${{secrets.TELEGRAM_BOT_USERNAME}}
 
     steps:
     - uses: actions/checkout@v3
