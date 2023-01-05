@@ -1,4 +1,4 @@
-package com.example.telegramweatherbot.handler;
+package com.manzar.telegramweatherbot.handler;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 
