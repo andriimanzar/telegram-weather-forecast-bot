@@ -1,6 +1,6 @@
-package com.example.telegramweatherbot.handler;
+package com.manzar.telegramweatherbot.handler;
 
-import com.example.telegramweatherbot.model.UserRequest;
+import com.manzar.telegramweatherbot.model.UserRequest;
 
 /**
  * Declares methods, that used in every user requests handlers.

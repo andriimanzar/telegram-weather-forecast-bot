@@ -1,4 +1,4 @@
-package com.example.telegramweatherbot;
+package com.manzar.telegramweatherbot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

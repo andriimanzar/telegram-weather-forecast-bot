@@ -1,6 +1,6 @@
-package com.example.telegramweatherbot.bot;
+package com.manzar.telegramweatherbot.bot;
 
-import com.example.telegramweatherbot.exception.BotRegistrationException;
+import com.manzar.telegramweatherbot.exception.BotRegistrationException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

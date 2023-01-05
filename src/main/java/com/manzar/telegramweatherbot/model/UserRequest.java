@@ -1,4 +1,4 @@
-package com.example.telegramweatherbot.model;
+package com.manzar.telegramweatherbot.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.example.telegramweatherbot.exception;
+package com.manzar.telegramweatherbot.exception;
 
 /**
  * Exception for bot registration failures.
