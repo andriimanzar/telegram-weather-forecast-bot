@@ -8,6 +8,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+/**
+ * Service, that performs message sending from bot to user.
+ */
 @AllArgsConstructor
 @Service
 public class MessageSendingService {
