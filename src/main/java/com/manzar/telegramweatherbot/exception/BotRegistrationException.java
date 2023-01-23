@@ -5,10 +5,6 @@ package com.manzar.telegramweatherbot.exception;
  */
 public class BotRegistrationException extends RuntimeException {
 
-  public BotRegistrationException(String message) {
-    super(message);
-  }
-
   public BotRegistrationException(String message, Throwable cause) {
     super(message, cause);
   }
