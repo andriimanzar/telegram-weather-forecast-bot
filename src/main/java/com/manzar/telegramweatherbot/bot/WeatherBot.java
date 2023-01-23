@@ -6,7 +6,6 @@ import com.manzar.telegramweatherbot.handler.DispatcherHandler;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -48,7 +47,6 @@ public class WeatherBot extends TelegramLongPollingBot {
     return botToken;
   }
 
-  @SneakyThrows
   @Override
   public void onUpdateReceived(Update update) {
 
