@@ -1,8 +1,12 @@
 package com.manzar.telegramweatherbot.bot;
 
 import com.manzar.telegramweatherbot.exception.BotRegistrationException;
+import com.manzar.telegramweatherbot.exception.UnexpectedUpdateException;
+import com.manzar.telegramweatherbot.handler.DispatcherHandler;
+import com.manzar.telegramweatherbot.model.UserRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -22,6 +26,7 @@ public class WeatherBot extends TelegramLongPollingBot {
   private String botToken;
   @Value("${telegram-bot.username}")
   private String botUsername;
+  private final DispatcherHandler dispatcherHandler;
 
   /**
    * Method, that will be called after creation bean for this class.
@@ -43,8 +48,17 @@ public class WeatherBot extends TelegramLongPollingBot {
     return botToken;
   }
 
+  @SneakyThrows
   @Override
   public void onUpdateReceived(Update update) {
+
+    UserRequest userRequest = new UserRequest(update, update.getMessage().getChatId());
+
+    boolean dispatched = dispatcherHandler.dispatch(userRequest);
+
+    if (!dispatched) {
+      throw new UnexpectedUpdateException("Unexpected update!");
+    }
   }
 
   @Override
