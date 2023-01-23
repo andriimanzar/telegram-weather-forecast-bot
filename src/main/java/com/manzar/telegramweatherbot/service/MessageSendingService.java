@@ -1,7 +1,7 @@
 package com.manzar.telegramweatherbot.service;
 
-import com.manzar.telegramweatherbot.bot.WeatherBot;
 import com.manzar.telegramweatherbot.exception.MessageSendingException;
+import com.manzar.telegramweatherbot.sender.WeatherBotSender;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -15,7 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Service
 public class MessageSendingService {
 
-  private WeatherBot weatherBot;
+  private WeatherBotSender weatherBotSender;
 
   /**
    * Sends text message to user, but without a keyboard.
@@ -43,7 +43,7 @@ public class MessageSendingService {
 
   private void execute(SendMessage sendMessage) {
     try {
-      weatherBot.execute(sendMessage);
+      weatherBotSender.execute(sendMessage);
     } catch (TelegramApiException e) {
       throw new MessageSendingException("Cannot send message");
     }
