@@ -6,8 +6,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.manzar.telegramweatherbot.bot.WeatherBot;
 import com.manzar.telegramweatherbot.exception.MessageSendingException;
+import com.manzar.telegramweatherbot.sender.WeatherBotSender;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,7 +22,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 class MessageSendingServiceTest {
 
   @Mock
-  private WeatherBot weatherBot;
+  private WeatherBotSender weatherBotSender;
   @InjectMocks
   private MessageSendingService messageSendingService;
 
@@ -31,14 +31,14 @@ class MessageSendingServiceTest {
 
     messageSendingService.sendMessage(1L, "test", new ReplyKeyboardMarkup());
 
-    verify(weatherBot,
+    verify(weatherBotSender,
         times(1)).execute(any(SendMessage.class));
   }
 
   @Test
   void sendMessageThrowsAnExceptionIfMessageIsNotSent() throws TelegramApiException {
 
-    doThrow(TelegramApiException.class).when(weatherBot).execute(any(SendMessage.class));
+    doThrow(TelegramApiException.class).when(weatherBotSender).execute(any(SendMessage.class));
 
     assertThrows(MessageSendingException.class, () ->
         messageSendingService.sendMessage(1L, "test", new ReplyKeyboardMarkup()));
