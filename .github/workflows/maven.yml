@@ -21,6 +21,7 @@ jobs:
     env:
       TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
       TELEGRAM_BOT_USERNAME: ${{secrets.TELEGRAM_BOT_USERNAME}}
+      API_OPEN_WEATHER_MAP_KEY: ${{API_OPEN_WEATHER_MAP_KEY}}
 
     steps:
       - uses: actions/checkout@v3
