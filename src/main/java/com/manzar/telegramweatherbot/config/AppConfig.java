@@ -1,5 +1,6 @@
 package com.manzar.telegramweatherbot.config;
 
+import lombok.NonNull;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,7 @@ public class AppConfig {
     return new RestTemplateBuilder()
         .errorHandler(new DefaultResponseErrorHandler() {
           @Override
-          public void handleError(ClientHttpResponse response) {
+          public void handleError(@NonNull ClientHttpResponse response) {
           }
         })
         .build();
