@@ -11,4 +11,8 @@ public abstract class AbstractUserRequestHandler implements UserRequestHandler {
     return update.hasMessage() && update.getMessage().isCommand()
         && update.getMessage().getText().equals(command);
   }
+
+  public boolean isText(Update update) {
+    return update.hasMessage() && update.getMessage().hasText();
+  }
 }
