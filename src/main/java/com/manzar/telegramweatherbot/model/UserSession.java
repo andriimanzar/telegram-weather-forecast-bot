@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Represents user session.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "telegramId")
