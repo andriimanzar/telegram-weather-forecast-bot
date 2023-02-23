@@ -7,6 +7,9 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * UserSession service.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserSessionService {
@@ -17,6 +20,9 @@ public class UserSessionService {
     return userSessionRepository.findById(telegramId);
   }
 
+  /**
+   * Creates new UserSession by given telegramId if session not exists.
+   */
   public void createUserSession(Long telegramId) {
     if (getUserSession(telegramId).isEmpty()) {
       UserSession userSessionToSave = UserSession.builder().telegramId(telegramId)
