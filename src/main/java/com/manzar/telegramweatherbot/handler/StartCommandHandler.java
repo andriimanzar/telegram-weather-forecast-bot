@@ -29,7 +29,7 @@ public class StartCommandHandler extends AbstractUserRequestHandler implements U
 
   @Override
   public void handle(UserRequest dispatchRequest) {
-    userSessionService.createUserSession(
+    userSessionService.createUserSessionIfNotExists(
         UpdateParser.getTelegramId(dispatchRequest.getUpdate()));
 
     ReplyKeyboard replyKeyboard = startMenuKeyboardBuilder.build();

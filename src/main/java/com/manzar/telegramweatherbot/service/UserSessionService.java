@@ -23,7 +23,7 @@ public class UserSessionService {
   /**
    * Creates new UserSession by given telegramId if session not exists.
    */
-  public void createUserSession(Long telegramId) {
+  public void createUserSessionIfNotExists(Long telegramId) {
     if (getUserSession(telegramId).isEmpty()) {
       UserSession userSessionToSave = UserSession.builder().telegramId(telegramId)
           .conversationState(ConversationState.CONVERSATION_STARTED).build();
