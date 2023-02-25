@@ -3,6 +3,8 @@ package com.manzar.telegramweatherbot.handler;
 import com.manzar.telegramweatherbot.keyboard.StartMenuKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
+import com.manzar.telegramweatherbot.service.UserSessionService;
+import com.manzar.telegramweatherbot.util.UpdateParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -18,6 +20,7 @@ public class StartCommandHandler extends AbstractUserRequestHandler implements U
 
   private final MessageSendingService messageSendingService;
   private final StartMenuKeyboardBuilder startMenuKeyboardBuilder;
+  private final UserSessionService userSessionService;
 
   @Override
   public boolean isApplicable(UserRequest request) {
@@ -26,6 +29,9 @@ public class StartCommandHandler extends AbstractUserRequestHandler implements U
 
   @Override
   public void handle(UserRequest dispatchRequest) {
+    userSessionService.createUserSession(
+        UpdateParser.getTelegramId(dispatchRequest.getUpdate()));
+
     ReplyKeyboard replyKeyboard = startMenuKeyboardBuilder.build();
     messageSendingService.sendMessage(dispatchRequest.getChatId(),
         "I can help you with weather forecast☁️", replyKeyboard);
