@@ -1,8 +1,12 @@
 package com.manzar.telegramweatherbot.handler;
 
+import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
+import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
+import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.util.CityNameValidator;
+import com.manzar.telegramweatherbot.util.UpdateParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,21 +19,30 @@ public class CityEnteredHandler extends AbstractUserRequestHandler {
 
   private final CityNameValidator cityNameValidator;
   private final MessageSendingService messageSendingService;
+  private final UserSessionService userSessionService;
 
   @Override
   public boolean isApplicable(UserRequest request) {
-    return isText(request.getUpdate());
+    return isText(request.getUpdate()) && request.getUserSession().getConversationState().equals(
+        ConversationState.WAITING_FOR_CITY);
   }
 
   @Override
   public void handle(UserRequest requestToDispatch) {
-    String cityName = requestToDispatch.getUpdate().getMessage().getText();
-    if (!cityNameValidator.enteredCityExists(cityName)) {
+    String city = requestToDispatch.getUpdate().getMessage().getText();
+
+    if (!cityNameValidator.enteredCityExists(city)) {
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
           "Entered city not found. Please, try again");
     } else {
+      UserSession userSession = userSessionService.getUserSession(
+          UpdateParser.getTelegramId(requestToDispatch.getUpdate())).get();
+      userSession.setCity(city);
+      userSession.setConversationState(ConversationState.WAITING_FOR_DATE);
+      userSessionService.editUserSession(userSession);
+
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          "Now, choose how many days you want to see the weather forecast");
+          "Now, write the date for which you would like to see the forecast");
     }
   }
 
