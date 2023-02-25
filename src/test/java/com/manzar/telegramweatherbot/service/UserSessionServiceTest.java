@@ -37,7 +37,7 @@ class UserSessionServiceTest {
     Mockito.when(userSessionRepository.save(ArgumentMatchers.any(UserSession.class)))
         .thenReturn(userSession);
 
-    userSessionService.createUserSession(1L);
+    userSessionService.createUserSessionIfNotExists(1L);
 
     Mockito.verify(userSessionRepository, Mockito.times(1)).save(userSession);
   }
@@ -47,7 +47,7 @@ class UserSessionServiceTest {
     UserSession userSession = UserSessionFactory.createTestUserSession();
     Mockito.when(userSessionRepository.findById(1L)).thenReturn(Optional.of(userSession));
 
-    userSessionService.createUserSession(1L);
+    userSessionService.createUserSessionIfNotExists(1L);
 
     Mockito.verify(userSessionRepository, Mockito.times(0)).save(userSession);
   }
