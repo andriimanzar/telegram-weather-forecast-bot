@@ -15,4 +15,8 @@ public abstract class AbstractUserRequestHandler implements UserRequestHandler {
   public boolean isText(Update update) {
     return update.hasMessage() && update.getMessage().hasText();
   }
+
+  public boolean isTextAndEquals(Update update, String text) {
+    return isText(update) && update.getMessage().getText().equals(text);
+  }
 }
