@@ -9,6 +9,9 @@ import com.manzar.telegramweatherbot.service.UserSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/**
+ * Handles show forecast message.
+ */
 @Component
 @RequiredArgsConstructor
 public class ShowForecastHandler extends AbstractUserRequestHandler implements UserRequestHandler {
