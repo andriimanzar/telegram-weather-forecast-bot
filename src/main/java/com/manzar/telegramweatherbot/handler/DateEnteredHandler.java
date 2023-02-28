@@ -5,42 +5,45 @@ import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
-import com.manzar.telegramweatherbot.util.CityNameValidator;
+import com.manzar.telegramweatherbot.service.WeatherService;
+import com.manzar.telegramweatherbot.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * Handles user message, that contains city name.
+ * Handles user message, that contains date.
  */
 @Component
 @RequiredArgsConstructor
-public class CityEnteredHandler extends AbstractUserRequestHandler {
+public class DateEnteredHandler extends AbstractUserRequestHandler implements UserRequestHandler {
 
-  private final CityNameValidator cityNameValidator;
+
   private final MessageSendingService messageSendingService;
+  private final WeatherService weatherService;
   private final UserSessionService userSessionService;
 
   @Override
   public boolean isApplicable(UserRequest request) {
     return isText(request.getUpdate()) && request.getUserSession().getConversationState().equals(
-        ConversationState.WAITING_FOR_CITY);
+        ConversationState.WAITING_FOR_DATE);
   }
 
   @Override
   public void handle(UserRequest requestToDispatch) {
-    String city = requestToDispatch.getUpdate().getMessage().getText();
-
-    if (!cityNameValidator.enteredCityExists(city)) {
+    String date = requestToDispatch.getUpdate().getMessage().getText();
+    if (!DateUtils.isValid(date)) {
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          "Entered city not found. Please, try again");
+          "Please, enter the date in day/month format(e.g. 20/12)");
     } else {
       UserSession userSession = requestToDispatch.getUserSession();
-      userSession.setCity(city);
-      userSession.setConversationState(ConversationState.WAITING_FOR_DATE);
+      userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
       userSessionService.editUserSession(userSession);
 
+      String city = requestToDispatch.getUserSession().getCity();
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          "Now, write the date for which you would like to see the forecast in day/month format");
+          weatherService.getWeatherForecastByCityNameAndDate(city, DateUtils.parse(date)));
+
+
     }
   }
 
