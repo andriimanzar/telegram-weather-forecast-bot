@@ -6,7 +6,6 @@ import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.util.CityNameValidator;
-import com.manzar.telegramweatherbot.util.UpdateParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -35,14 +34,13 @@ public class CityEnteredHandler extends AbstractUserRequestHandler {
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
           "Entered city not found. Please, try again");
     } else {
-      UserSession userSession = userSessionService.getUserSession(
-          UpdateParser.getTelegramId(requestToDispatch.getUpdate())).get();
+      UserSession userSession = requestToDispatch.getUserSession();
       userSession.setCity(city);
       userSession.setConversationState(ConversationState.WAITING_FOR_DATE);
       userSessionService.editUserSession(userSession);
 
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          "Now, write the date for which you would like to see the forecast");
+          "Now, write the date for which you would like to see the forecast in day/month format");
     }
   }
 
