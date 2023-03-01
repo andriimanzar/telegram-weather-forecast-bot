@@ -1,5 +1,7 @@
 package com.manzar.telegramweatherbot.util;
 
+import com.github.prominence.openweathermap.api.model.forecast.WeatherForecast;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -8,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ForecastFormatter {
 
-  public String format() {
+  public String format(List<WeatherForecast> requestedDayForecasts) {
     // TODO: must take weather forecast to format and return formatted String.
     return null;
   }

@@ -1,8 +1,12 @@
 package com.manzar.telegramweatherbot.service;
 
 import com.github.prominence.openweathermap.api.OpenWeatherMapClient;
+import com.github.prominence.openweathermap.api.model.forecast.Forecast;
+import com.github.prominence.openweathermap.api.model.forecast.WeatherForecast;
 import com.manzar.telegramweatherbot.util.ForecastFormatter;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +28,14 @@ public class WeatherService {
    * @return a String formatted forecast
    */
   public String getWeatherForecastByCityNameAndDate(String cityName, LocalDate requestedDay) {
-    // TODO: This method must return already formatted weather forecast
-    //  for given city and date as String object.
-    return null;
+    Forecast forecastForFiveDays = openWeatherMapClient.forecast5Day3HourStep().byCityName(cityName)
+        .retrieve().asJava();
+    List<WeatherForecast> requestedDayForecasts = forecastForFiveDays.getWeatherForecasts()
+        .stream()
+        .filter(threeHourPeriodForecast -> threeHourPeriodForecast.getForecastTime().toLocalDate()
+            .equals(requestedDay)).collect(Collectors.toList());
+
+    return forecastFormatter.format(requestedDayForecasts);
   }
 
 }
