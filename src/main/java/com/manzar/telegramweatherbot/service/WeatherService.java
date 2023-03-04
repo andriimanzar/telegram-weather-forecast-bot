@@ -1,6 +1,7 @@
 package com.manzar.telegramweatherbot.service;
 
 import com.github.prominence.openweathermap.api.OpenWeatherMapClient;
+import com.github.prominence.openweathermap.api.enums.UnitSystem;
 import com.github.prominence.openweathermap.api.model.forecast.Forecast;
 import com.github.prominence.openweathermap.api.model.forecast.WeatherForecast;
 import com.manzar.telegramweatherbot.util.ForecastFormatter;
@@ -29,13 +30,13 @@ public class WeatherService {
    */
   public String getWeatherForecastByCityNameAndDate(String cityName, LocalDate requestedDay) {
     Forecast forecastForFiveDays = openWeatherMapClient.forecast5Day3HourStep().byCityName(cityName)
-        .retrieve().asJava();
+        .unitSystem(UnitSystem.METRIC).retrieve().asJava();
     List<WeatherForecast> requestedDayForecasts = forecastForFiveDays.getWeatherForecasts()
         .stream()
         .filter(threeHourPeriodForecast -> threeHourPeriodForecast.getForecastTime().toLocalDate()
             .equals(requestedDay)).collect(Collectors.toList());
 
-    return forecastFormatter.format(requestedDayForecasts);
+    return forecastFormatter.format(requestedDayForecasts, cityName);
   }
 
 }
