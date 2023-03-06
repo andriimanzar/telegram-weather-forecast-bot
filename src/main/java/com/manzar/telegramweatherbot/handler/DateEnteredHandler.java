@@ -1,5 +1,6 @@
 package com.manzar.telegramweatherbot.handler;
 
+import com.manzar.telegramweatherbot.keyboard.RemoveKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
@@ -21,11 +22,12 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
   private final MessageSendingService messageSendingService;
   private final WeatherService weatherService;
   private final UserSessionService userSessionService;
+  private final RemoveKeyboardBuilder removeKeyboardBuilder;
 
   @Override
   public boolean isApplicable(UserRequest request) {
-    return isText(request.getUpdate()) && request.getUserSession().getConversationState().equals(
-        ConversationState.WAITING_FOR_DATE);
+    return isText(request.getUpdate()) && request.getUserSession().getConversationState()
+        .equals(ConversationState.WAITING_FOR_DATE);
   }
 
   @Override
@@ -35,15 +37,15 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
           "Please, enter the date in day/month format(e.g. 20/12)");
     } else {
+
       UserSession userSession = requestToDispatch.getUserSession();
       userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
       userSessionService.editUserSession(userSession);
 
       String city = requestToDispatch.getUserSession().getCity();
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          weatherService.getWeatherForecastByCityNameAndDate(city, DateUtils.parse(date)));
-
-
+          weatherService.getWeatherForecastByCityNameAndDate(city, DateUtils.parse(date)),
+          removeKeyboardBuilder.build());
     }
   }
 
