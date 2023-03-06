@@ -9,6 +9,9 @@ import com.manzar.telegramweatherbot.service.UserSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/**
+ * Handles user request to change city.
+ */
 @Component
 @RequiredArgsConstructor
 public class ChangeCityHandler extends AbstractUserRequestHandler implements UserRequestHandler {
