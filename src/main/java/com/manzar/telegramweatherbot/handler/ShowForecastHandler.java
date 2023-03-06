@@ -1,6 +1,7 @@
 package com.manzar.telegramweatherbot.handler;
 
-import com.manzar.telegramweatherbot.constant.Constants;
+import com.manzar.telegramweatherbot.constant.ButtonLabel;
+import com.manzar.telegramweatherbot.keyboard.ChangeCityKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
@@ -18,20 +19,29 @@ public class ShowForecastHandler extends AbstractUserRequestHandler implements U
 
   private final MessageSendingService messageSendingService;
   private final UserSessionService userSessionService;
+  private final ChangeCityKeyboardBuilder changeCityKeyboardBuilder;
 
   @Override
   public boolean isApplicable(UserRequest request) {
-    return isTextAndEquals(request.getUpdate(), Constants.SHOW_FORECAST);
+    return isTextAndEquals(request.getUpdate(),
+        String.valueOf(ButtonLabel.SHOW_FORECAST.getValue()));
   }
 
   @Override
   public void handle(UserRequest requestToDispatch) {
     UserSession sessionToUpdate = requestToDispatch.getUserSession();
-    sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_CITY);
-    userSessionService.editUserSession(sessionToUpdate);
 
-    messageSendingService.sendMessage(requestToDispatch.getChatId(),
-        "Please, enter the name of the city for which you want to see the weather forecast⛅");
+    if (requestToDispatch.getUserSession().getCity() == null) {
+      messageSendingService.sendMessage(requestToDispatch.getChatId(),
+          "Please, enter the name of the city for which you want to see the weather forecast⛅");
+      sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_CITY);
+    } else {
+      messageSendingService.sendMessage(requestToDispatch.getChatId(),
+          "Now, write the date for which you would like to see the forecast in day/month format",
+          changeCityKeyboardBuilder.build());
+      sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_DATE);
+    }
+    userSessionService.editUserSession(sessionToUpdate);
   }
 
   @Override
