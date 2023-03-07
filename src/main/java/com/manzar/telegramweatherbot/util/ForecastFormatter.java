@@ -23,9 +23,9 @@ public class ForecastFormatter {
    */
   public String format(List<WeatherForecast> requestedDayForecasts, String cityName) {
     if (requestedDayForecasts.isEmpty()) {
-      return "Thank you for using our feather forecast service. "
-          + "Our predictions for requested day have ended. "
-          + "Please check back later for updated forecasts.";
+      return "🙏 Thank you for using our service! "
+          + "Our predictions for this period have ended or we were unable to request a forecast "
+          + "because we can only parse weather for the next 5 days. Please try again later.";
     }
 
     StringBuilder stringBuilder = new StringBuilder();
@@ -54,7 +54,7 @@ public class ForecastFormatter {
   }
 
   private void appendTemperature(WeatherForecast weatherForecast, StringBuilder stringBuilder) {
-    double temperature = Math.round(weatherForecast.getTemperature().getValue());
+    int temperature = (int) Math.round(weatherForecast.getTemperature().getValue());
     if (temperature > 0) {
       stringBuilder.append("+");
     }

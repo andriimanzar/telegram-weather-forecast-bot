@@ -35,7 +35,8 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
     String date = requestToDispatch.getUpdate().getMessage().getText();
     if (!DateUtils.isValid(date)) {
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          "Please, enter the date in day/month format(e.g. 20/12)");
+          "📅 Sorry, the date you entered is invalid. "
+              + "Please use the format day/month. Example: 15/03");
     } else {
 
       UserSession userSession = requestToDispatch.getUserSession();
