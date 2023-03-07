@@ -34,9 +34,11 @@ public class StartCommandHandler extends AbstractUserRequestHandler implements U
 
     ReplyKeyboard replyKeyboard = startMenuKeyboardBuilder.build();
     messageSendingService.sendMessage(dispatchRequest.getChatId(),
-        "I can help you with weather forecast☁️", replyKeyboard);
+        "👋 Hello! 🌦️I can help you with the weather forecast!🌡️",
+        replyKeyboard);
     messageSendingService.sendMessage(dispatchRequest.getChatId(),
-        "Choose from menu what are you interested in");
+        "🏠 Main Menu 🌐" + System.lineSeparator()
+            + "What would you like to do next? Choose an option below: ⬇️");
   }
 
   @Override

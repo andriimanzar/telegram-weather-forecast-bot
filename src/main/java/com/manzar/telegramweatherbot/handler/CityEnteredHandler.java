@@ -22,8 +22,8 @@ public class CityEnteredHandler extends AbstractUserRequestHandler {
 
   @Override
   public boolean isApplicable(UserRequest request) {
-    return isText(request.getUpdate()) && request.getUserSession().getConversationState().equals(
-        ConversationState.WAITING_FOR_CITY);
+    return isText(request.getUpdate()) && request.getUserSession().getConversationState()
+        .equals(ConversationState.WAITING_FOR_CITY);
   }
 
   @Override
@@ -32,7 +32,7 @@ public class CityEnteredHandler extends AbstractUserRequestHandler {
 
     if (!cityNameValidator.enteredCityExists(city)) {
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          "Entered city not found. Please, try again");
+          "🤖 Sorry, I couldn't find the city you entered. Please try again!");
     } else {
       UserSession userSession = requestToDispatch.getUserSession();
       userSession.setCity(city);
@@ -40,7 +40,8 @@ public class CityEnteredHandler extends AbstractUserRequestHandler {
       userSessionService.editUserSession(userSession);
 
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          "Now, write the date for which you would like to see the forecast in day/month format");
+          "Please enter the date ⌨️📅 in day/month format (e.g. 05/03) "
+              + "for which you would like to see the weather forecast 🌦️🌡️.");
     }
   }
 

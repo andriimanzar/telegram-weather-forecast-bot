@@ -28,7 +28,8 @@ public class ChangeCityHandler extends AbstractUserRequestHandler implements Use
   @Override
   public void handle(UserRequest requestToDispatch) {
     messageSendingService.sendMessage(requestToDispatch.getChatId(),
-        "Please, enter the name of the city for which you want to see the weather forecast⛅");
+        "Please enter the name of the city 🌆🌃 "
+            + "for which you would like to see the weather forecast 🌦️🌡️.");
     UserSession sessionToUpdate = requestToDispatch.getUserSession();
     sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_CITY);
     userSessionService.editUserSession(sessionToUpdate);

@@ -33,11 +33,13 @@ public class ShowForecastHandler extends AbstractUserRequestHandler implements U
 
     if (requestToDispatch.getUserSession().getCity() == null) {
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          "Please, enter the name of the city for which you want to see the weather forecast⛅");
+          "Please enter the name of the city 🌆🌃 "
+              + "for which you would like to see the weather forecast 🌦️🌡️.");
       sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_CITY);
     } else {
       messageSendingService.sendMessage(requestToDispatch.getChatId(),
-          "Now, write the date for which you would like to see the forecast in day/month format",
+          "Please enter the date ⌨️📅 in day/month format (e.g. 05/03) "
+              + "for which you would like to see the weather forecast 🌦️🌡️.",
           changeCityKeyboardBuilder.build());
       sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_DATE);
     }
