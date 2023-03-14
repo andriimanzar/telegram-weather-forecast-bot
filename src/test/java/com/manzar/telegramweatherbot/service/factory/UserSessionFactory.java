@@ -1,4 +1,4 @@
-package com.manzar.telegramweatherbot.service;
+package com.manzar.telegramweatherbot.service.factory;
 
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserSession;

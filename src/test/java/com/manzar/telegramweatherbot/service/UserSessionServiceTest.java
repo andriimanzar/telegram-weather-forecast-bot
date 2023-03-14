@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.repository.UserSessionRepository;
+import com.manzar.telegramweatherbot.service.factory.UserSessionFactory;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
