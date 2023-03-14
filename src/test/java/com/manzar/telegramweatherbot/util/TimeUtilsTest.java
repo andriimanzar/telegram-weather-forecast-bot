@@ -1,10 +1,12 @@
 package com.manzar.telegramweatherbot.util;
 
+import static com.manzar.telegramweatherbot.service.factory.NotificationFactory.createNotification;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
 import com.manzar.telegramweatherbot.model.Notification;
+import com.manzar.telegramweatherbot.model.NotificationType;
 import java.time.LocalTime;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,8 +36,8 @@ class TimeUtilsTest {
 
   @Test
   void notificationTimeEqualsCurrentReturnsTrueIfTimeEqualsCurrent() {
-    Notification notificationToTrigger = Notification.builder()
-        .notificationTime(TEST_TIME).build();
+    Notification notificationToTrigger = createNotification(
+        NotificationType.TOMORROW, TEST_TIME);
 
     setValidTime();
 
@@ -45,8 +47,8 @@ class TimeUtilsTest {
 
   @Test
   void notificationTimeEqualsCurrentReturnsFalseIfTimeIsNotEqualsCurrent() {
-    Notification notificationNotToTrigger = Notification.builder()
-        .notificationTime(TEST_TIME.plusHours(1)).build();
+    Notification notificationNotToTrigger = createNotification(
+        NotificationType.TOMORROW, TEST_TIME.minusHours(1));
 
     setValidTime();
 
