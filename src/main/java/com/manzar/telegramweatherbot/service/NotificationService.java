@@ -39,16 +39,19 @@ public class NotificationService {
 
 
   private void sendNotification(Notification notification) {
-    LocalDate weatherForecastDate = null;
-    NotificationType currentNotificationType = notification.getNotificationType();
     String cityName = notification.getUserSession().getCity();
-    if (currentNotificationType.equals(NotificationType.TOMORROW)) {
-      weatherForecastDate = LocalDate.now().plusDays(1);
-    } else if (currentNotificationType.equals(NotificationType.MORNING_AND_AFTERNOON)) {
-      weatherForecastDate = LocalDate.now();
+    String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(cityName,
+        calculateForecastDate(notification.getNotificationType()));
+
+    messageSendingService.sendMessage(notification.getChatId(), formattedForecast);
+  }
+
+  private LocalDate calculateForecastDate(NotificationType notificationType) {
+    if (notificationType.equals(NotificationType.TOMORROW)) {
+      return LocalDate.now().plusDays(1);
+    } else {
+      return LocalDate.now();
     }
-    messageSendingService.sendMessage(notification.getChatId(),
-        weatherService.getWeatherForecastByCityNameAndDate(cityName,
-            weatherForecastDate));
   }
 }
+
