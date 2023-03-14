@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 public class TimeUtils {
 
   public static boolean notificationTimeEqualsCurrent(Notification notification) {
-    return notification.getNotificationTime().truncatedTo(ChronoUnit.MINUTES)
-        .equals(LocalTime.now().truncatedTo(ChronoUnit.MINUTES));
+    return notification.getNotificationTime().truncatedTo(ChronoUnit.HOURS)
+        .equals(LocalTime.now().truncatedTo(ChronoUnit.HOURS));
   }
 }
