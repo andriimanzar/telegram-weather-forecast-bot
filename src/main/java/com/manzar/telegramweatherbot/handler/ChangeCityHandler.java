@@ -6,18 +6,18 @@ import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Handles user request to change city.
  */
 @Component
-@RequiredArgsConstructor
 public class ChangeCityHandler extends AbstractUserRequestHandler implements UserRequestHandler {
 
-  private final MessageSendingService messageSendingService;
-  private final UserSessionService userSessionService;
+  public ChangeCityHandler(MessageSendingService messageSendingService,
+      UserSessionService userSessionService) {
+    super(messageSendingService, userSessionService);
+  }
 
   @Override
   public boolean isApplicable(UserRequest request) {
@@ -27,12 +27,12 @@ public class ChangeCityHandler extends AbstractUserRequestHandler implements Use
 
   @Override
   public void handle(UserRequest requestToDispatch) {
-    messageSendingService.sendMessage(requestToDispatch.getChatId(),
+    getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
         "Please enter the name of the city 🌆🌃 "
             + "for which you would like to see the weather forecast 🌦️🌡️.");
     UserSession sessionToUpdate = requestToDispatch.getUserSession();
     sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_CITY);
-    userSessionService.editUserSession(sessionToUpdate);
+    getUserSessionService().editUserSession(sessionToUpdate);
   }
 
   @Override

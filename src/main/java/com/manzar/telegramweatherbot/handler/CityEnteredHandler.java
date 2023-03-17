@@ -6,19 +6,21 @@ import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.util.CityNameValidator;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Handles user message, that contains city name.
  */
 @Component
-@RequiredArgsConstructor
 public class CityEnteredHandler extends AbstractUserRequestHandler {
 
   private final CityNameValidator cityNameValidator;
-  private final MessageSendingService messageSendingService;
-  private final UserSessionService userSessionService;
+
+  public CityEnteredHandler(MessageSendingService messageSendingService,
+      UserSessionService userSessionService, CityNameValidator cityNameValidator) {
+    super(messageSendingService, userSessionService);
+    this.cityNameValidator = cityNameValidator;
+  }
 
   @Override
   public boolean isApplicable(UserRequest request) {
@@ -31,15 +33,15 @@ public class CityEnteredHandler extends AbstractUserRequestHandler {
     String city = requestToDispatch.getUpdate().getMessage().getText();
 
     if (!cityNameValidator.enteredCityExists(city)) {
-      messageSendingService.sendMessage(requestToDispatch.getChatId(),
+      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
           "🤖 Sorry, I couldn't find the city you entered. Please try again!");
     } else {
       UserSession userSession = requestToDispatch.getUserSession();
       userSession.setCity(city);
       userSession.setConversationState(ConversationState.WAITING_FOR_DATE);
-      userSessionService.editUserSession(userSession);
+      getUserSessionService().editUserSession(userSession);
 
-      messageSendingService.sendMessage(requestToDispatch.getChatId(),
+      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
           "Please enter the date ⌨️📅 in day/month format (e.g. 05/03) "
               + "for which you would like to see the weather forecast 🌦️🌡️.");
     }
