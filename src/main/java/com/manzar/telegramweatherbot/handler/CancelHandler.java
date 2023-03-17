@@ -7,19 +7,21 @@ import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Handles cancel request from user.
  */
 @Component
-@RequiredArgsConstructor
 public class CancelHandler extends AbstractUserRequestHandler implements UserRequestHandler {
 
-  private final MessageSendingService messageSendingService;
-  private final UserSessionService userSessionService;
   private final StartMenuKeyboardBuilder startMenuKeyboardBuilder;
+
+  public CancelHandler(MessageSendingService messageSendingService,
+      UserSessionService userSessionService, StartMenuKeyboardBuilder startMenuKeyboardBuilder) {
+    super(messageSendingService, userSessionService);
+    this.startMenuKeyboardBuilder = startMenuKeyboardBuilder;
+  }
 
   @Override
   public boolean isApplicable(UserRequest request) {
@@ -29,13 +31,13 @@ public class CancelHandler extends AbstractUserRequestHandler implements UserReq
 
   @Override
   public void handle(UserRequest requestToDispatch) {
-    messageSendingService.sendMessage(requestToDispatch.getChatId(),
+    getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
         "🔙 You have been sent back to the main menu! 🏠",
         startMenuKeyboardBuilder.build());
 
     UserSession userSession = requestToDispatch.getUserSession();
     userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
-    userSessionService.editUserSession(userSession);
+    getUserSessionService().editUserSession(userSession);
   }
 
   @Override

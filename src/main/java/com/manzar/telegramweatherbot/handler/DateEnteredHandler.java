@@ -8,21 +8,29 @@ import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.service.WeatherService;
 import com.manzar.telegramweatherbot.util.DateUtils;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Handles user message, that contains date.
  */
 @Component
-@RequiredArgsConstructor
 public class DateEnteredHandler extends AbstractUserRequestHandler implements UserRequestHandler {
 
 
-  private final MessageSendingService messageSendingService;
   private final WeatherService weatherService;
-  private final UserSessionService userSessionService;
   private final RemoveKeyboardBuilder removeKeyboardBuilder;
+
+  /**
+   * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
+   * common fields inherited from the parent.
+   */
+  public DateEnteredHandler(MessageSendingService messageSendingService,
+      UserSessionService userSessionService, WeatherService weatherService,
+      RemoveKeyboardBuilder removeKeyboardBuilder) {
+    super(messageSendingService, userSessionService);
+    this.weatherService = weatherService;
+    this.removeKeyboardBuilder = removeKeyboardBuilder;
+  }
 
   @Override
   public boolean isApplicable(UserRequest request) {
@@ -34,17 +42,17 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
   public void handle(UserRequest requestToDispatch) {
     String date = requestToDispatch.getUpdate().getMessage().getText();
     if (!DateUtils.isValid(date)) {
-      messageSendingService.sendMessage(requestToDispatch.getChatId(),
+      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
           "📅 Sorry, the date you entered is invalid. "
               + "Please use the format day/month. Example: 15/03");
     } else {
 
       UserSession userSession = requestToDispatch.getUserSession();
       userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
-      userSessionService.editUserSession(userSession);
+      getUserSessionService().editUserSession(userSession);
 
       String city = requestToDispatch.getUserSession().getCity();
-      messageSendingService.sendMessage(requestToDispatch.getChatId(),
+      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
           weatherService.getWeatherForecastByCityNameAndDate(city, DateUtils.parse(date)),
           removeKeyboardBuilder.build());
     }
