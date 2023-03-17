@@ -19,7 +19,7 @@ public class ForecastFormatter {
    * @param cityName              the name of the city for which the weather forecast is being
    *                              formatted.
    * @return a formatted string containing the weather forecast for the specified city and day or
-   *     informs user that there is no forecast for requested day.
+   * informs user that there is no forecast for requested day.
    */
   public String format(List<WeatherForecast> requestedDayForecasts, String cityName) {
     if (requestedDayForecasts.isEmpty()) {
@@ -68,8 +68,9 @@ public class ForecastFormatter {
   }
 
   private void appendWind(WeatherForecast weatherForecast, StringBuilder stringBuilder) {
-    stringBuilder.append("💨").append(weatherForecast.getWind().getSpeed()).append(" ")
-        .append(weatherForecast.getWind().getUnit());
+    double windSpeed = weatherForecast.getWind().getSpeed();
+    stringBuilder.append("💨").append(String.format("%.1f", windSpeed)).append(" ")
+        .append("m/s");
   }
 }
 
