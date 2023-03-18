@@ -1,6 +1,7 @@
 package com.manzar.telegramweatherbot.handler;
 
 import com.manzar.telegramweatherbot.constant.ButtonLabel;
+import com.manzar.telegramweatherbot.keyboard.NotificationTypeKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
@@ -15,10 +16,13 @@ import org.springframework.stereotype.Component;
 public class SetNotificationsHandler extends AbstractUserRequestHandler implements
     UserRequestHandler {
 
-  public SetNotificationsHandler(
-      MessageSendingService messageSendingService,
-      UserSessionService userSessionService) {
+  private final NotificationTypeKeyboardBuilder notificationTypeKeyboardBuilder;
+
+  public SetNotificationsHandler(MessageSendingService messageSendingService,
+      UserSessionService userSessionService,
+      NotificationTypeKeyboardBuilder notificationTypeKeyboardBuilder) {
     super(messageSendingService, userSessionService);
+    this.notificationTypeKeyboardBuilder = notificationTypeKeyboardBuilder;
   }
 
   @Override
@@ -37,7 +41,8 @@ public class SetNotificationsHandler extends AbstractUserRequestHandler implemen
       userSession.setConversationState(ConversationState.WAITING_FOR_NOTIFICATION_TYPE);
       getUserSessionService().editUserSession(userSession);
       getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
-          "🔔 Please choose the type of weather notifications you want to receive from this bot");
+          "🔔 Please choose the type of weather notifications you want to receive from this bot",
+          notificationTypeKeyboardBuilder.build());
     }
   }
 
