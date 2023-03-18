@@ -68,8 +68,9 @@ public class ForecastFormatter {
   }
 
   private void appendWind(WeatherForecast weatherForecast, StringBuilder stringBuilder) {
-    stringBuilder.append("💨").append(weatherForecast.getWind().getSpeed()).append(" ")
-        .append(weatherForecast.getWind().getUnit());
+    double windSpeed = weatherForecast.getWind().getSpeed();
+    stringBuilder.append("💨").append(String.format("%.1f", windSpeed)).append(" ")
+        .append("m/s");
   }
 }
 
