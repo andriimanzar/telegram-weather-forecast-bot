@@ -39,19 +39,24 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
     String chosenOption = requestToDispatch.getUpdate().getMessage().getText();
     UserSession userSession = requestToDispatch.getUserSession();
     Long chatId = requestToDispatch.getChatId();
+
     if (chosenOption.equals(FOR_TOMORROW.getValue())) {
       notificationService.createTomorrowNotification(userSession, chatId, Optional.empty());
       userSession.setConversationState(ConversationState.WAITING_FOR_NOTIFICATION_TIME);
       getMessageSendingService().sendMessage(chatId,
           "🕒 Please choose a time when you'd like to receive notifications.");
-    } else if (chosenOption.equals(FOR_MORNING_AND_AFTERNOON.getValue())) {
+    }
+
+    else if (chosenOption.equals(FOR_MORNING_AND_AFTERNOON.getValue())) {
       notificationService.createMorningAndAfternoonNotification(userSession, chatId);
       userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
       getMessageSendingService().sendMessage(chatId,
           "🌤️ You will receive weather forecast notifications for "
               + requestToDispatch.getUserSession().getCity()
               + " at 7:00 AM and 3:00 PM every day. Stay updated! 🌦️");
-    } else if (chosenOption.equals(UNFOLLOW_NOTIFICATIONS.getValue())) {
+    }
+
+    else if (chosenOption.equals(UNFOLLOW_NOTIFICATIONS.getValue())) {
       notificationService.deleteNotifications(userSession.getTelegramId());
       userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
       getMessageSendingService().sendMessage(chatId,
@@ -59,6 +64,7 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
               + "You will no longer receive updates about the weather in your city. "
               + "If you change your mind, you can always follow the notifications again later. 🌤️");
     }
+
     getUserSessionService().editUserSession(userSession);
   }
 
