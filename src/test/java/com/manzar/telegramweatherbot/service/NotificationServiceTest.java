@@ -2,8 +2,6 @@ package com.manzar.telegramweatherbot.service;
 
 import static com.manzar.telegramweatherbot.service.factory.NotificationFactory.TEST_CITY;
 import static com.manzar.telegramweatherbot.service.factory.NotificationFactory.createNotification;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mockStatic;
@@ -14,9 +12,11 @@ import static org.mockito.Mockito.when;
 import com.manzar.telegramweatherbot.model.Notification;
 import com.manzar.telegramweatherbot.model.NotificationType;
 import com.manzar.telegramweatherbot.repository.NotificationRepository;
+import com.manzar.telegramweatherbot.service.factory.UserSessionFactory;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -52,31 +52,37 @@ class NotificationServiceTest {
     localTimeMock.close();
   }
 
+
   @Test
-  void createOrUpdateNotificationCallsRepositorySaveMethod() {
+  void createMorningAndAfternoonNotificationCallsRepositorySaveTwoTimes() {
+    notificationService.createMorningAndAfternoonNotification(
+        UserSessionFactory.createTestUserSession(), 1L);
+
+    verify(notificationRepository, times(2)).save(any(Notification.class));
+  }
+
+  @Test
+  void createTomorrowNotificationCallsRepositorySave() {
+    notificationService.createTomorrowNotification(UserSessionFactory.createTestUserSession(), 1L,
+        Optional.of(LocalTime.of(15, 0)));
+
+    verify(notificationRepository, times(1)).save(any(Notification.class));
+  }
+
+  @Test
+  void deleteNotificationCallsRepositoryDeleteAllByUserSessionTelegramIdIfNotificationExists() {
     Notification notification = createNotification(NotificationType.TOMORROW, TEST_TIME);
+    notificationRepository.save(notification);
 
-    when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
+    notificationService.deleteNotifications(1L);
 
-    notificationService.createOrUpdateNotification(notification);
-
-    verify(notificationRepository, times(1)).save(notification);
+    verify(notificationRepository, times(1)).deleteAllByUserSessionTelegramId(anyLong());
   }
 
   @Test
-  void deleteNotificationReturnsTrueIfNotificationDeletedRepositoryDeleteMethod() {
+  void deleteNotificationDoesNotCallRepositoryDeleteAllBeUserSessionTelegramIdIfNotificationsNotExists() {
 
-    when(notificationRepository.deleteNotificationByUserSessionTelegramId(anyLong())).thenReturn(
-        true);
-
-    assertTrue(notificationService.deleteNotifications(1L));
-    verify(notificationRepository, times(1)).deleteNotificationByUserSessionTelegramId(anyLong());
-  }
-
-  @Test
-  void deleteNotificationReturnsFalseIfNotificationsNotExists() {
-
-    assertFalse(notificationService.deleteNotifications(1L));
+    verify(notificationRepository, times(0)).deleteAllByUserSessionTelegramId(anyLong());
   }
 
   @Test

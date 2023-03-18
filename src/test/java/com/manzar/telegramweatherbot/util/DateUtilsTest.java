@@ -2,8 +2,10 @@ package com.manzar.telegramweatherbot.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.manzar.telegramweatherbot.model.NotificationType;
 import java.time.LocalDate;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,6 +23,18 @@ class DateUtilsTest {
   @MethodSource("provideStringDatesAndExpectedLocalDates")
   void parseReturnsCorrectExpectedDate(String date, LocalDate parsedDate) {
     assertEquals(parsedDate, DateUtils.parse(date));
+  }
+
+  @Test
+  void calculateForecastDateReturnsTomorrowDateIfNotificationTypeIsForTomorrow() {
+    assertEquals(LocalDate.now().plusDays(1),
+        DateUtils.calculateForecastDate(NotificationType.TOMORROW));
+  }
+
+  @Test
+  void calculateForecastDateReturnsTodayDateIfNotificationTypeIsForMorningAndAfternoon() {
+    assertEquals(LocalDate.now(),
+        DateUtils.calculateForecastDate(NotificationType.MORNING_AND_AFTERNOON));
   }
 
   private static Stream<Arguments> provideDates() {
