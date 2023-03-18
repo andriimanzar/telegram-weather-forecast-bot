@@ -2,9 +2,13 @@ package com.manzar.telegramweatherbot.service;
 
 import com.manzar.telegramweatherbot.model.Notification;
 import com.manzar.telegramweatherbot.model.NotificationType;
+import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.repository.NotificationRepository;
+import com.manzar.telegramweatherbot.util.DateUtils;
 import com.manzar.telegramweatherbot.util.TimeUtils;
-import java.time.LocalDate;
+import jakarta.transaction.Transactional;
+import java.time.LocalTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -20,12 +24,37 @@ public class NotificationService {
   private final NotificationRepository notificationRepository;
   private final MessageSendingService messageSendingService;
 
-  public Notification createOrUpdateNotification(Notification notification) {
-    return notificationRepository.save(notification);
+  /**
+   * Creates a morning and afternoon weather forecast notification for the given user session and
+   * chat ID.
+   *
+   * @param userSession the user session for which the notifications are being created
+   * @param chatId      the chat ID associated with the user session
+   */
+  public void createMorningAndAfternoonNotification(UserSession userSession, Long chatId) {
+    createNotification(userSession, chatId, NotificationType.MORNING_AND_AFTERNOON,
+        Optional.of(LocalTime.of(7, 0)));
+    createNotification(userSession, chatId, NotificationType.MORNING_AND_AFTERNOON,
+        Optional.of(LocalTime.of(14, 0)));
   }
 
-  public boolean deleteNotifications(Long telegramId) {
-    return notificationRepository.deleteNotificationByUserSessionTelegramId(telegramId);
+  /**
+   * Creates a weather forecast notification for tomorrow for the given user session, chat ID and
+   * time.
+   *
+   * @param userSession      the user session for which the notifications are being created
+   * @param chatId           the chat ID associated with the user session
+   * @param notificationTime the time, at which the notification will trigger
+   */
+  public void createTomorrowNotification(UserSession userSession, Long chatId,
+      Optional<LocalTime> notificationTime) {
+    createNotification(userSession, chatId, NotificationType.TOMORROW,
+        notificationTime);
+  }
+
+  @Transactional
+  public void deleteNotifications(Long telegramId) {
+    notificationRepository.deleteAllByUserSessionTelegramId(telegramId);
   }
 
   /**
@@ -41,17 +70,23 @@ public class NotificationService {
   private void sendNotification(Notification notification) {
     String cityName = notification.getUserSession().getCity();
     String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(cityName,
-        calculateForecastDate(notification.getNotificationType()));
+        DateUtils.calculateForecastDate(notification.getNotificationType()));
 
     messageSendingService.sendMessage(notification.getChatId(), formattedForecast);
   }
 
-  private LocalDate calculateForecastDate(NotificationType notificationType) {
-    if (notificationType.equals(NotificationType.TOMORROW)) {
-      return LocalDate.now().plusDays(1);
+  private void createNotification(UserSession userSession, Long chatId,
+      NotificationType notificationType, Optional<LocalTime> notificationTime) {
+    Notification notification;
+    if (notificationTime.isPresent()) {
+      notification = Notification.builder().userSession(userSession).chatId(chatId)
+          .notificationType(notificationType).notificationTime(notificationTime.get())
+          .build();
     } else {
-      return LocalDate.now();
+      notification = Notification.builder().userSession(userSession)
+          .notificationType(notificationType).build();
     }
+    notificationRepository.save(notification);
   }
 }
 
