@@ -1,5 +1,6 @@
 package com.manzar.telegramweatherbot.util;
 
+import com.manzar.telegramweatherbot.model.NotificationType;
 import java.time.LocalDate;
 
 /**
@@ -20,5 +21,14 @@ public class DateUtils {
     return LocalDate.of(LocalDate.now().getYear(), month, day);
   }
 
-
+  /**
+   * Calculates the forecast date based on the given notification type.
+   */
+  public static LocalDate calculateForecastDate(NotificationType notificationType) {
+    if (notificationType.equals(NotificationType.TOMORROW)) {
+      return LocalDate.now().plusDays(1);
+    } else {
+      return LocalDate.now();
+    }
+  }
 }
