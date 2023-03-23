@@ -1,6 +1,6 @@
 package com.manzar.telegramweatherbot.handler;
 
-import com.manzar.telegramweatherbot.keyboard.RemoveKeyboardBuilder;
+import com.manzar.telegramweatherbot.keyboard.StartMenuKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
@@ -18,7 +18,8 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
 
 
   private final WeatherService weatherService;
-  private final RemoveKeyboardBuilder removeKeyboardBuilder;
+  private final StartMenuKeyboardBuilder startMenuKeyboardBuilder;
+
 
   /**
    * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
@@ -26,11 +27,12 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
    */
   public DateEnteredHandler(MessageSendingService messageSendingService,
       UserSessionService userSessionService, WeatherService weatherService,
-      RemoveKeyboardBuilder removeKeyboardBuilder) {
+      StartMenuKeyboardBuilder startMenuKeyboardBuilder) {
     super(messageSendingService, userSessionService);
     this.weatherService = weatherService;
-    this.removeKeyboardBuilder = removeKeyboardBuilder;
+    this.startMenuKeyboardBuilder = startMenuKeyboardBuilder;
   }
+
 
   @Override
   public boolean isApplicable(UserRequest request) {
@@ -40,11 +42,11 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
 
   @Override
   public void handle(UserRequest requestToDispatch) {
+    Long chatId = requestToDispatch.getChatId();
     String date = requestToDispatch.getUpdate().getMessage().getText();
     if (!DateUtils.isValid(date)) {
-      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
-          "📅 Sorry, the date you entered is invalid. "
-              + "Please use the format day/month. Example: 15/03");
+      getMessageSendingService().sendMessage(chatId, "📅 Sorry, the date you entered is invalid. "
+          + "Please use the format day/month. Example: 15/03");
     } else {
 
       UserSession userSession = requestToDispatch.getUserSession();
@@ -52,9 +54,11 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
       getUserSessionService().editUserSession(userSession);
 
       String city = requestToDispatch.getUserSession().getCity();
-      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
-          weatherService.getWeatherForecastByCityNameAndDate(city, DateUtils.parse(date)),
-          removeKeyboardBuilder.build());
+      String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(city,
+          DateUtils.parse(date));
+      getMessageSendingService().sendMessage(chatId, formattedForecast,
+          startMenuKeyboardBuilder.build());
+
     }
   }
 

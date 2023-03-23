@@ -5,6 +5,7 @@ import static com.manzar.telegramweatherbot.constant.ButtonLabel.FOR_TOMORROW;
 import static com.manzar.telegramweatherbot.constant.ButtonLabel.UNFOLLOW_NOTIFICATIONS;
 
 import com.manzar.telegramweatherbot.keyboard.NotificationTimeKeyboardBuilder;
+import com.manzar.telegramweatherbot.keyboard.StartMenuKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
@@ -22,7 +23,9 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
     UserRequestHandler {
 
   private final NotificationService notificationService;
+  private final StartMenuKeyboardBuilder startMenuKeyboardBuilder;
   private final NotificationTimeKeyboardBuilder notificationTimeKeyboardBuilder;
+
 
   /**
    * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
@@ -30,16 +33,14 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
    */
   public NotificationTypeHandler(MessageSendingService messageSendingService,
       UserSessionService userSessionService, NotificationService notificationService,
+      StartMenuKeyboardBuilder startMenuKeyboardBuilder,
       NotificationTimeKeyboardBuilder notificationTimeKeyboardBuilder) {
     super(messageSendingService, userSessionService);
     this.notificationService = notificationService;
+    this.startMenuKeyboardBuilder = startMenuKeyboardBuilder;
     this.notificationTimeKeyboardBuilder = notificationTimeKeyboardBuilder;
   }
 
-  /**
-   * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
-   * common fields inherited from the parent.
-   */
   @Override
   public boolean isApplicable(UserRequest request) {
     return isText(request.getUpdate()) && request.getUserSession().getConversationState()
@@ -65,7 +66,8 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
       getMessageSendingService().sendMessage(chatId,
           "🌤️ You will receive weather forecast notifications for "
               + requestToDispatch.getUserSession().getCity()
-              + " at 7:00 AM and 3:00 PM every day. Stay updated! 🌦️");
+              + " at 7:00 AM and 3:00 PM every day. Stay updated! 🌦️",
+          startMenuKeyboardBuilder.build());
 
     } else if (chosenOption.equals(UNFOLLOW_NOTIFICATIONS.getValue())) {
       notificationService.deleteNotifications(userSession.getTelegramId());

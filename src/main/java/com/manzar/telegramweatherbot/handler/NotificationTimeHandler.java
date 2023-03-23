@@ -1,6 +1,6 @@
 package com.manzar.telegramweatherbot.handler;
 
-import com.manzar.telegramweatherbot.keyboard.RemoveKeyboardBuilder;
+import com.manzar.telegramweatherbot.keyboard.StartMenuKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
@@ -20,7 +20,8 @@ public class NotificationTimeHandler extends AbstractUserRequestHandler implemen
     UserRequestHandler {
 
   private final NotificationService notificationService;
-  private final RemoveKeyboardBuilder removeKeyboardBuilder;
+  private final StartMenuKeyboardBuilder startMenuKeyboardBuilder;
+
 
   /**
    * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
@@ -28,10 +29,10 @@ public class NotificationTimeHandler extends AbstractUserRequestHandler implemen
    */
   public NotificationTimeHandler(MessageSendingService messageSendingService,
       UserSessionService userSessionService, NotificationService notificationService,
-      RemoveKeyboardBuilder removeKeyboardBuilder) {
+      StartMenuKeyboardBuilder startMenuKeyboardBuilder) {
     super(messageSendingService, userSessionService);
     this.notificationService = notificationService;
-    this.removeKeyboardBuilder = removeKeyboardBuilder;
+    this.startMenuKeyboardBuilder = startMenuKeyboardBuilder;
   }
 
   @Override
@@ -57,7 +58,7 @@ public class NotificationTimeHandler extends AbstractUserRequestHandler implemen
       getMessageSendingService().sendMessage(chatId,
           "🌤️ You will receive weather forecast notifications for "
               + requestToDispatch.getUserSession().getCity() + " at " + notificationTime
-              + " every day. Stay updated!🌦️", removeKeyboardBuilder.build());
+              + " every day. Stay updated!🌦️", startMenuKeyboardBuilder.build());
     } else {
       getMessageSendingService().sendMessage(chatId,
           "⚠️ Please enter the notification time in `HH:mm` format with `00` minutes.");
