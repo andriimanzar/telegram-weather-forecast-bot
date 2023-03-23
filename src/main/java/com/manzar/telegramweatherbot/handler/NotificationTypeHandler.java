@@ -4,6 +4,7 @@ import static com.manzar.telegramweatherbot.constant.ButtonLabel.FOR_MORNING_AND
 import static com.manzar.telegramweatherbot.constant.ButtonLabel.FOR_TOMORROW;
 import static com.manzar.telegramweatherbot.constant.ButtonLabel.UNFOLLOW_NOTIFICATIONS;
 
+import com.manzar.telegramweatherbot.keyboard.NotificationTimeKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
@@ -21,13 +22,24 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
     UserRequestHandler {
 
   private final NotificationService notificationService;
+  private final NotificationTimeKeyboardBuilder notificationTimeKeyboardBuilder;
 
+  /**
+   * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
+   * common fields inherited from the parent.
+   */
   public NotificationTypeHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService, NotificationService notificationService) {
+      UserSessionService userSessionService, NotificationService notificationService,
+      NotificationTimeKeyboardBuilder notificationTimeKeyboardBuilder) {
     super(messageSendingService, userSessionService);
     this.notificationService = notificationService;
+    this.notificationTimeKeyboardBuilder = notificationTimeKeyboardBuilder;
   }
 
+  /**
+   * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
+   * common fields inherited from the parent.
+   */
   @Override
   public boolean isApplicable(UserRequest request) {
     return isText(request.getUpdate()) && request.getUserSession().getConversationState()
@@ -44,7 +56,8 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
       notificationService.createTomorrowNotification(userSession, chatId, Optional.empty());
       userSession.setConversationState(ConversationState.WAITING_FOR_NOTIFICATION_TIME);
       getMessageSendingService().sendMessage(chatId,
-          "🕒 Please choose a time when you'd like to receive notifications.");
+          "🕒 Please choose a time when you'd like to receive notifications.",
+          notificationTimeKeyboardBuilder.build());
 
     } else if (chosenOption.equals(FOR_MORNING_AND_AFTERNOON.getValue())) {
       notificationService.createMorningAndAfternoonNotification(userSession, chatId);
@@ -56,7 +69,7 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
 
     } else if (chosenOption.equals(UNFOLLOW_NOTIFICATIONS.getValue())) {
       notificationService.deleteNotifications(userSession.getTelegramId());
-      userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
+      userSession.setConversationState(ConversationState.WAITING_FOR_NOTIFICATION_TYPE);
       getMessageSendingService().sendMessage(chatId,
           "🔕 You have unfollowed all weather forecast notifications. "
               + "You will no longer receive updates about the weather in your city. "
