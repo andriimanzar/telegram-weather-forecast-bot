@@ -7,8 +7,8 @@ public enum ButtonLabel {
 
   CANCEL_BUTTON("❌Cancel"), SHOW_FORECAST("☀️Show forecast"), SETTINGS(
       "⚙️Settings"), SET_NOTIFICATIONS("🚨Set notifications"), CHANGE_CITY(
-      "🏙️Change city"), FOR_TOMORROW("Tomorrow"), FOR_MORNING_AND_AFTERNOON(
-      "Morning and afternoon"), UNFOLLOW_NOTIFICATIONS("🔕 Unfollow Notifications");
+      "🏙️Change city"), FOR_TOMORROW("☑️Tomorrow"), FOR_MORNING_AND_AFTERNOON(
+      "☑️Morning and afternoon"), UNFOLLOW_NOTIFICATIONS("🔕 Unfollow Notifications");
 
   private final String value;
 
