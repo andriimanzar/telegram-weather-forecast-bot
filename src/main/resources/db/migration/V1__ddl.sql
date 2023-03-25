@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS user_session
     telegram_id        BIGINT,
     city               VARCHAR(255),
     conversation_state VARCHAR(255) NOT NULL,
+    language           VARCHAR(255),
+    metric_system      VARCHAR(255),
     CONSTRAINT user_session_PK PRIMARY KEY (telegram_id)
 );
 
