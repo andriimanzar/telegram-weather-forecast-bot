@@ -1,5 +1,6 @@
 package com.manzar.telegramweatherbot.handler;
 
+import com.manzar.telegramweatherbot.service.LocalizationService;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
 import lombok.Getter;
@@ -15,6 +16,7 @@ public abstract class AbstractUserRequestHandler implements UserRequestHandler {
 
   private final MessageSendingService messageSendingService;
   private final UserSessionService userSessionService;
+  private final LocalizationService localizationService;
 
   public boolean isCommand(Update update, String command) {
     return update.hasMessage() && update.getMessage().isCommand()
@@ -23,10 +25,6 @@ public abstract class AbstractUserRequestHandler implements UserRequestHandler {
 
   public boolean isText(Update update) {
     return update.hasMessage() && update.getMessage().hasText();
-  }
-
-  public boolean isTextAndEquals(Update update, String text) {
-    return isText(update) && update.getMessage().getText().equals(text);
   }
 }
 

@@ -1,5 +1,6 @@
 package com.manzar.telegramweatherbot.model;
 
+import com.github.prominence.openweathermap.api.enums.UnitSystem;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,5 +37,11 @@ public class UserSession {
   @Column(name = "conversation_state")
   @Enumerated(EnumType.STRING)
   private ConversationState conversationState;
+  @Column(name = "language")
+  @Enumerated(EnumType.STRING)
+  private Language language;
+  @Column(name = "unit_system")
+  @Enumerated(EnumType.STRING)
+  private UnitSystem unitSystem;
 
 }

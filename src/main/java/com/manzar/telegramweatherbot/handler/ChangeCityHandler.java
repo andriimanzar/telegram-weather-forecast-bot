@@ -1,12 +1,14 @@
 package com.manzar.telegramweatherbot.handler;
 
-import com.manzar.telegramweatherbot.constant.ButtonLabel;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
+import com.manzar.telegramweatherbot.service.LocalizationService;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
+import com.manzar.telegramweatherbot.util.UpdateParser;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**
  * Handles user request to change city.
@@ -15,24 +17,26 @@ import org.springframework.stereotype.Component;
 public class ChangeCityHandler extends AbstractUserRequestHandler implements UserRequestHandler {
 
   public ChangeCityHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService) {
-    super(messageSendingService, userSessionService);
+      UserSessionService userSessionService, LocalizationService localizationService) {
+    super(messageSendingService, userSessionService, localizationService);
   }
 
   @Override
   public boolean isApplicable(UserRequest request) {
-    return isText(request.getUpdate()) && request.getUpdate().getMessage().getText()
-        .equals(ButtonLabel.CHANGE_CITY.getValue());
+    Update update = request.getUpdate();
+    String text = UpdateParser.getText(update);
+    return isText(update) && getLocalizationService().localizedButtonLabelEqualsGivenText(
+        request.getUserSession(), text, "change.city");
   }
 
   @Override
   public void handle(UserRequest requestToDispatch) {
-    getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
-        "Please enter the name of the city 🌆🌃 "
-            + "for which you would like to see the weather forecast 🌦️🌡️.");
     UserSession sessionToUpdate = requestToDispatch.getUserSession();
     sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_CITY);
     getUserSessionService().editUserSession(sessionToUpdate);
+
+    getMessageSendingService().sendMessage(sessionToUpdate,
+        "enter.city");
   }
 
   @Override

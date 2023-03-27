@@ -1,12 +1,9 @@
 package com.manzar.telegramweatherbot.keyboard;
 
-import static com.manzar.telegramweatherbot.constant.ButtonLabel.CANCEL_BUTTON;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -18,7 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 public class NotificationTimeKeyboardBuilder implements KeyboardBuilder {
 
   @Override
-  public ReplyKeyboard build() {
+  public ReplyKeyboardMarkup build() {
     return ReplyKeyboardMarkup.builder().keyboard(createAllRows()).selective(true)
         .resizeKeyboard(true).oneTimeKeyboard(true).build();
   }
@@ -29,7 +26,7 @@ public class NotificationTimeKeyboardBuilder implements KeyboardBuilder {
         .collect(Collectors.toList());
 
     KeyboardRow rowWithCancel = new KeyboardRow(
-        List.of(new KeyboardButton(CANCEL_BUTTON.getValue())));
+        List.of(new KeyboardButton("cancel.button")));
     allRows.add(rowWithCancel);
 
     return allRows;

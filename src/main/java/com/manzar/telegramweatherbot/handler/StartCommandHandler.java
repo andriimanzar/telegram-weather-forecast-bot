@@ -2,11 +2,11 @@ package com.manzar.telegramweatherbot.handler;
 
 import com.manzar.telegramweatherbot.keyboard.StartMenuKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.UserRequest;
+import com.manzar.telegramweatherbot.service.LocalizationService;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.util.UpdateParser;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
 /**
  * Handles start command.
@@ -19,8 +19,10 @@ public class StartCommandHandler extends AbstractUserRequestHandler implements U
   private final StartMenuKeyboardBuilder startMenuKeyboardBuilder;
 
   public StartCommandHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService, StartMenuKeyboardBuilder startMenuKeyboardBuilder) {
-    super(messageSendingService, userSessionService);
+      UserSessionService userSessionService,
+      LocalizationService localizationService,
+      StartMenuKeyboardBuilder startMenuKeyboardBuilder) {
+    super(messageSendingService, userSessionService, localizationService);
     this.startMenuKeyboardBuilder = startMenuKeyboardBuilder;
   }
 
@@ -34,13 +36,11 @@ public class StartCommandHandler extends AbstractUserRequestHandler implements U
     getUserSessionService().createUserSessionIfNotExists(
         UpdateParser.getTelegramId(dispatchRequest.getUpdate()));
 
-    ReplyKeyboard replyKeyboard = startMenuKeyboardBuilder.build();
-    getMessageSendingService().sendMessage(dispatchRequest.getChatId(),
-        "👋 Hello! 🌦️I can help you with the weather forecast!🌡️",
-        replyKeyboard);
-    getMessageSendingService().sendMessage(dispatchRequest.getChatId(),
-        "🏠 Main Menu 🌐" + System.lineSeparator()
-            + "What would you like to do next? Choose an option below: ⬇️");
+    getMessageSendingService().sendMessage(dispatchRequest.getUserSession(),
+        "greeting",
+        startMenuKeyboardBuilder.build());
+    getMessageSendingService().sendMessage(dispatchRequest.getUserSession(),
+        "main.menu");
   }
 
   @Override

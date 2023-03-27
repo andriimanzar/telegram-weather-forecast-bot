@@ -1,9 +1,9 @@
 package com.manzar.telegramweatherbot.service;
 
 import com.github.prominence.openweathermap.api.OpenWeatherMapClient;
-import com.github.prominence.openweathermap.api.enums.UnitSystem;
 import com.github.prominence.openweathermap.api.model.forecast.Forecast;
 import com.github.prominence.openweathermap.api.model.forecast.WeatherForecast;
+import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.util.ForecastFormatter;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,19 +24,21 @@ public class WeatherService {
   /**
    * Retrieves the weather forecast for a given city name and date.
    *
-   * @param cityName     the name of the city to retrieve the forecast for
+   * @param userSession  current user session
    * @param requestedDay the date to retrieve the forecast for
    * @return a String formatted forecast
    */
-  public String getWeatherForecastByCityNameAndDate(String cityName, LocalDate requestedDay) {
-    Forecast forecastForFiveDays = openWeatherMapClient.forecast5Day3HourStep().byCityName(cityName)
-        .unitSystem(UnitSystem.METRIC).retrieve().asJava();
+  public String getWeatherForecastByCityNameAndDate(UserSession userSession,
+      LocalDate requestedDay) {
+    Forecast forecastForFiveDays = openWeatherMapClient.forecast5Day3HourStep().byCityName(
+        userSession.getCity()).unitSystem(userSession.getUnitSystem()).retrieve().asJava();
+
     List<WeatherForecast> requestedDayForecasts = forecastForFiveDays.getWeatherForecasts()
         .stream()
         .filter(threeHourPeriodForecast -> threeHourPeriodForecast.getForecastTime().toLocalDate()
             .equals(requestedDay)).collect(Collectors.toList());
 
-    return forecastFormatter.format(requestedDayForecasts, cityName);
+    return forecastFormatter.format(userSession, requestedDayForecasts);
   }
 
 }

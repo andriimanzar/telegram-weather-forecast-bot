@@ -68,11 +68,12 @@ public class NotificationService {
 
 
   private void sendNotification(Notification notification) {
-    String cityName = notification.getUserSession().getCity();
-    String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(cityName,
+    UserSession userSession = notification.getUserSession();
+    String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(
+        userSession,
         DateUtils.calculateForecastDate(notification.getNotificationType()));
 
-    messageSendingService.sendMessage(notification.getChatId(), formattedForecast);
+    messageSendingService.sendMessage(userSession, formattedForecast);
   }
 
   private void createNotification(UserSession userSession, Long chatId,

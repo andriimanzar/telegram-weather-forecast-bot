@@ -4,6 +4,7 @@ import com.manzar.telegramweatherbot.keyboard.StartMenuKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
+import com.manzar.telegramweatherbot.service.LocalizationService;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.service.WeatherService;
@@ -25,14 +26,15 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
    * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
    * common fields inherited from the parent.
    */
+
   public DateEnteredHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService, WeatherService weatherService,
-      StartMenuKeyboardBuilder startMenuKeyboardBuilder) {
-    super(messageSendingService, userSessionService);
+      UserSessionService userSessionService,
+      LocalizationService localizationService,
+      WeatherService weatherService, StartMenuKeyboardBuilder startMenuKeyboardBuilder) {
+    super(messageSendingService, userSessionService, localizationService);
     this.weatherService = weatherService;
     this.startMenuKeyboardBuilder = startMenuKeyboardBuilder;
   }
-
 
   @Override
   public boolean isApplicable(UserRequest request) {
@@ -42,21 +44,19 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
 
   @Override
   public void handle(UserRequest requestToDispatch) {
-    Long chatId = requestToDispatch.getChatId();
     String date = requestToDispatch.getUpdate().getMessage().getText();
+    UserSession userSession = requestToDispatch.getUserSession();
     if (!DateUtils.isValid(date)) {
-      getMessageSendingService().sendMessage(chatId, "📅 Sorry, the date you entered is invalid. "
-          + "Please use the format day/month. Example: 15/03");
+      getMessageSendingService().sendMessage(userSession,
+          "invalid.date");
     } else {
 
-      UserSession userSession = requestToDispatch.getUserSession();
       userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
       getUserSessionService().editUserSession(userSession);
 
-      String city = requestToDispatch.getUserSession().getCity();
-      String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(city,
+      String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(userSession,
           DateUtils.parse(date));
-      getMessageSendingService().sendMessage(chatId, formattedForecast,
+      getMessageSendingService().sendMessage(userSession, formattedForecast,
           startMenuKeyboardBuilder.build());
 
     }

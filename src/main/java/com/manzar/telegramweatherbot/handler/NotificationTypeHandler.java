@@ -1,19 +1,18 @@
 package com.manzar.telegramweatherbot.handler;
 
-import static com.manzar.telegramweatherbot.constant.ButtonLabel.FOR_MORNING_AND_AFTERNOON;
-import static com.manzar.telegramweatherbot.constant.ButtonLabel.FOR_TOMORROW;
-import static com.manzar.telegramweatherbot.constant.ButtonLabel.UNFOLLOW_NOTIFICATIONS;
-
 import com.manzar.telegramweatherbot.keyboard.NotificationTimeKeyboardBuilder;
 import com.manzar.telegramweatherbot.keyboard.StartMenuKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
+import com.manzar.telegramweatherbot.service.LocalizationService;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.NotificationService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
+import com.manzar.telegramweatherbot.util.UpdateParser;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**
  * Handles notification type, chosen by user.
@@ -26,16 +25,16 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
   private final StartMenuKeyboardBuilder startMenuKeyboardBuilder;
   private final NotificationTimeKeyboardBuilder notificationTimeKeyboardBuilder;
 
-
   /**
    * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
    * common fields inherited from the parent.
    */
   public NotificationTypeHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService, NotificationService notificationService,
-      StartMenuKeyboardBuilder startMenuKeyboardBuilder,
+      UserSessionService userSessionService,
+      LocalizationService localizationService,
+      NotificationService notificationService, StartMenuKeyboardBuilder startMenuKeyboardBuilder,
       NotificationTimeKeyboardBuilder notificationTimeKeyboardBuilder) {
-    super(messageSendingService, userSessionService);
+    super(messageSendingService, userSessionService, localizationService);
     this.notificationService = notificationService;
     this.startMenuKeyboardBuilder = startMenuKeyboardBuilder;
     this.notificationTimeKeyboardBuilder = notificationTimeKeyboardBuilder;
@@ -49,33 +48,31 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
 
   @Override
   public void handle(UserRequest requestToDispatch) {
-    String chosenOption = requestToDispatch.getUpdate().getMessage().getText();
+    Update update = requestToDispatch.getUpdate();
+    String chosenOption = UpdateParser.getText(update);
     UserSession userSession = requestToDispatch.getUserSession();
     Long chatId = requestToDispatch.getChatId();
 
-    if (chosenOption.equals(FOR_TOMORROW.getValue())) {
+    if (getLocalizationService().localizedButtonLabelEqualsGivenText(userSession, chosenOption,
+        "tomorrow.type")) {
       notificationService.createTomorrowNotification(userSession, chatId, Optional.empty());
       userSession.setConversationState(ConversationState.WAITING_FOR_NOTIFICATION_TIME);
-      getMessageSendingService().sendMessage(chatId,
-          "🕒 Please choose a time when you'd like to receive notifications.",
+      getMessageSendingService().sendMessage(userSession, "notification.time",
           notificationTimeKeyboardBuilder.build());
 
-    } else if (chosenOption.equals(FOR_MORNING_AND_AFTERNOON.getValue())) {
+    } else if (getLocalizationService().localizedButtonLabelEqualsGivenText(userSession,
+        chosenOption, "morning.and.afternoon.type")) {
+      String city = userSession.getCity();
       notificationService.createMorningAndAfternoonNotification(userSession, chatId);
       userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
-      getMessageSendingService().sendMessage(chatId,
-          "🌤️ You will receive weather forecast notifications for "
-              + requestToDispatch.getUserSession().getCity()
-              + " at 7:00 AM and 3:00 PM every day. Stay updated! 🌦️",
-          startMenuKeyboardBuilder.build());
+      getMessageSendingService().sendMessage(userSession, "morning.and.afternoon.notifications",
+          new String[]{city}, startMenuKeyboardBuilder.build());
 
-    } else if (chosenOption.equals(UNFOLLOW_NOTIFICATIONS.getValue())) {
+    } else if (getLocalizationService().localizedButtonLabelEqualsGivenText(userSession,
+        chosenOption, "unfollow.notifications")) {
       notificationService.deleteNotifications(userSession.getTelegramId());
       userSession.setConversationState(ConversationState.WAITING_FOR_NOTIFICATION_TYPE);
-      getMessageSendingService().sendMessage(chatId,
-          "🔕 You have unfollowed all weather forecast notifications. "
-              + "You will no longer receive updates about the weather in your city. "
-              + "If you change your mind, you can always follow the notifications again later. 🌤️");
+      getMessageSendingService().sendMessage(userSession, "notifications.unfollowed");
     }
 
     getUserSessionService().editUserSession(userSession);
