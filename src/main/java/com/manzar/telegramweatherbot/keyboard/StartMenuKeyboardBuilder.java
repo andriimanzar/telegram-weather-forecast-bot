@@ -1,9 +1,5 @@
 package com.manzar.telegramweatherbot.keyboard;
 
-import static com.manzar.telegramweatherbot.constant.ButtonLabel.SETTINGS;
-import static com.manzar.telegramweatherbot.constant.ButtonLabel.SET_NOTIFICATIONS;
-import static com.manzar.telegramweatherbot.constant.ButtonLabel.SHOW_FORECAST;
-
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -22,9 +18,9 @@ public class StartMenuKeyboardBuilder implements KeyboardBuilder {
   public ReplyKeyboardMarkup build() {
 
     KeyboardRow firstRow = new KeyboardRow(
-        List.of(new KeyboardButton(SHOW_FORECAST.getValue()), new KeyboardButton(
-            SET_NOTIFICATIONS.getValue())));
-    KeyboardRow secondRow = new KeyboardRow(List.of(new KeyboardButton(SETTINGS.getValue())));
+        List.of(new KeyboardButton("show.forecast"), new KeyboardButton(
+           "set.notifications")));
+    KeyboardRow secondRow = new KeyboardRow(List.of(new KeyboardButton("settings.button")));
 
     return ReplyKeyboardMarkup.builder().keyboard(List.of(firstRow, secondRow))
         .selective(true)
