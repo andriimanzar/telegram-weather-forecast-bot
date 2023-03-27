@@ -25,7 +25,7 @@ public class ForecastFormatter {
    * @param userSession           current user session
    * @param requestedDayForecasts the list of weather forecasts for the requested day.
    * @return a formatted string containing the weather forecast for the specified city and day or
-   * informs user that there is no forecast for requested day.
+   *     informs user that there is no forecast for requested day.
    */
   public String format(UserSession userSession, List<WeatherForecast> requestedDayForecasts) {
     if (requestedDayForecasts.isEmpty()) {
