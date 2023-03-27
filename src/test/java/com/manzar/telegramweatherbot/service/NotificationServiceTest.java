@@ -1,7 +1,7 @@
 package com.manzar.telegramweatherbot.service;
 
-import static com.manzar.telegramweatherbot.service.factory.NotificationFactory.TEST_CITY;
 import static com.manzar.telegramweatherbot.service.factory.NotificationFactory.createNotification;
+import static com.manzar.telegramweatherbot.service.factory.UserSessionFactory.createTestUserSession;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mockStatic;
@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import com.manzar.telegramweatherbot.model.Notification;
 import com.manzar.telegramweatherbot.model.NotificationType;
 import com.manzar.telegramweatherbot.repository.NotificationRepository;
-import com.manzar.telegramweatherbot.service.factory.UserSessionFactory;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -56,14 +55,14 @@ class NotificationServiceTest {
   @Test
   void createMorningAndAfternoonNotificationCallsRepositorySaveTwoTimes() {
     notificationService.createMorningAndAfternoonNotification(
-        UserSessionFactory.createTestUserSession(), 1L);
+        createTestUserSession(), 1L);
 
     verify(notificationRepository, times(2)).save(any(Notification.class));
   }
 
   @Test
   void createTomorrowNotificationCallsRepositorySave() {
-    notificationService.createTomorrowNotification(UserSessionFactory.createTestUserSession(), 1L,
+    notificationService.createTomorrowNotification(createTestUserSession(), 1L,
         Optional.of(LocalTime.of(15, 0)));
 
     verify(notificationRepository, times(1)).save(any(Notification.class));
@@ -93,9 +92,10 @@ class NotificationServiceTest {
     setValidTime();
     notificationService.sendAllNotifications();
 
-    verify(weatherService, times(1)).getWeatherForecastByCityNameAndDate(TEST_CITY,
+    verify(weatherService, times(1)).getWeatherForecastByCityNameAndDate(
+        createTestUserSession(),
         LocalDate.now());
-    verify(weatherService, times(1)).getWeatherForecastByCityNameAndDate(TEST_CITY,
+    verify(weatherService, times(1)).getWeatherForecastByCityNameAndDate(createTestUserSession(),
         LocalDate.now().plusDays(1));
 
     localTimeMock.clearInvocations();
