@@ -3,6 +3,7 @@ package com.manzar.telegramweatherbot.handler;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
+import com.manzar.telegramweatherbot.service.LocalizationService;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.util.CityNameValidator;
@@ -17,8 +18,10 @@ public class CityEnteredHandler extends AbstractUserRequestHandler {
   private final CityNameValidator cityNameValidator;
 
   public CityEnteredHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService, CityNameValidator cityNameValidator) {
-    super(messageSendingService, userSessionService);
+      UserSessionService userSessionService,
+      LocalizationService localizationService,
+      CityNameValidator cityNameValidator) {
+    super(messageSendingService, userSessionService, localizationService);
     this.cityNameValidator = cityNameValidator;
   }
 
@@ -31,19 +34,18 @@ public class CityEnteredHandler extends AbstractUserRequestHandler {
   @Override
   public void handle(UserRequest requestToDispatch) {
     String city = requestToDispatch.getUpdate().getMessage().getText();
+    UserSession userSession = requestToDispatch.getUserSession();
 
     if (!cityNameValidator.enteredCityExists(city)) {
-      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
-          "🤖 Sorry, I couldn't find the city you entered. Please try again!");
+      getMessageSendingService().sendMessage(userSession,
+          "city.not.found");
     } else {
-      UserSession userSession = requestToDispatch.getUserSession();
       userSession.setCity(city);
       userSession.setConversationState(ConversationState.WAITING_FOR_DATE);
       getUserSessionService().editUserSession(userSession);
 
-      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
-          "Please enter the date ⌨️📅 in day/month format (e.g. 05/03) "
-              + "for which you would like to see the weather forecast 🌦️🌡️.");
+      getMessageSendingService().sendMessage(userSession,
+          "enter.date");
     }
   }
 

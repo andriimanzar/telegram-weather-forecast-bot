@@ -11,4 +11,7 @@ public class UpdateParser {
     return update.getMessage().getFrom().getId();
   }
 
+  public static String getText(Update update) {
+    return update.getMessage().getText();
+  }
 }

@@ -1,13 +1,15 @@
 package com.manzar.telegramweatherbot.handler;
 
-import com.manzar.telegramweatherbot.constant.ButtonLabel;
 import com.manzar.telegramweatherbot.keyboard.ChangeCityKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
+import com.manzar.telegramweatherbot.service.LocalizationService;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
+import com.manzar.telegramweatherbot.util.UpdateParser;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**
  * Handles show forecast message.
@@ -18,15 +20,19 @@ public class ShowForecastHandler extends AbstractUserRequestHandler implements U
   private final ChangeCityKeyboardBuilder changeCityKeyboardBuilder;
 
   public ShowForecastHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService, ChangeCityKeyboardBuilder changeCityKeyboardBuilder) {
-    super(messageSendingService, userSessionService);
+      UserSessionService userSessionService,
+      LocalizationService localizationService,
+      ChangeCityKeyboardBuilder changeCityKeyboardBuilder) {
+    super(messageSendingService, userSessionService, localizationService);
     this.changeCityKeyboardBuilder = changeCityKeyboardBuilder;
   }
 
   @Override
   public boolean isApplicable(UserRequest request) {
-    return isTextAndEquals(request.getUpdate(),
-        String.valueOf(ButtonLabel.SHOW_FORECAST.getValue()));
+    Update update = request.getUpdate();
+    String text = UpdateParser.getText(update);
+    return isText(update) && getLocalizationService().localizedButtonLabelEqualsGivenText(
+        request.getUserSession(), text, "show.forecast");
   }
 
   @Override
@@ -34,14 +40,12 @@ public class ShowForecastHandler extends AbstractUserRequestHandler implements U
     UserSession sessionToUpdate = requestToDispatch.getUserSession();
 
     if (requestToDispatch.getUserSession().getCity() == null) {
-      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
-          "Please enter the name of the city 🌆🌃 "
-              + "for which you would like to see the weather forecast 🌦️🌡️.");
+      getMessageSendingService().sendMessage(sessionToUpdate,
+          "enter.city");
       sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_CITY);
     } else {
-      getMessageSendingService().sendMessage(requestToDispatch.getChatId(),
-          "Please enter the date ⌨️📅 in day/month format (e.g. 05/03) "
-              + "for which you would like to see the weather forecast 🌦️🌡️.",
+      getMessageSendingService().sendMessage(sessionToUpdate,
+          "enter.date",
           changeCityKeyboardBuilder.build());
       sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_DATE);
     }

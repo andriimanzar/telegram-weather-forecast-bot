@@ -4,13 +4,16 @@ import com.manzar.telegramweatherbot.keyboard.StartMenuKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
+import com.manzar.telegramweatherbot.service.LocalizationService;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
 import com.manzar.telegramweatherbot.service.NotificationService;
 import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.util.TimeUtils;
+import com.manzar.telegramweatherbot.util.UpdateParser;
 import java.time.LocalTime;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 /**
  * Handles notification time, chosen by user.
@@ -28,9 +31,9 @@ public class NotificationTimeHandler extends AbstractUserRequestHandler implemen
    * common fields inherited from the parent.
    */
   public NotificationTimeHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService, NotificationService notificationService,
-      StartMenuKeyboardBuilder startMenuKeyboardBuilder) {
-    super(messageSendingService, userSessionService);
+      UserSessionService userSessionService, LocalizationService localizationService,
+      NotificationService notificationService, StartMenuKeyboardBuilder startMenuKeyboardBuilder) {
+    super(messageSendingService, userSessionService, localizationService);
     this.notificationService = notificationService;
     this.startMenuKeyboardBuilder = startMenuKeyboardBuilder;
   }
@@ -43,25 +46,23 @@ public class NotificationTimeHandler extends AbstractUserRequestHandler implemen
 
   @Override
   public void handle(UserRequest requestToDispatch) {
-    String notificationTimeToParse = requestToDispatch.getUpdate().getMessage().getText();
+    Update update = requestToDispatch.getUpdate();
+    UserSession userSession = requestToDispatch.getUserSession();
     Long chatId = requestToDispatch.getChatId();
 
+    String notificationTimeToParse = UpdateParser.getText(update);
     if (TimeUtils.isValid(notificationTimeToParse)) {
-      UserSession userSession = requestToDispatch.getUserSession();
-      userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
       LocalTime notificationTime = LocalTime.parse(notificationTimeToParse);
-
-      notificationService.createTomorrowNotification(requestToDispatch.getUserSession(), chatId,
+      notificationService.createTomorrowNotification(userSession, chatId,
           Optional.of(notificationTime));
+      userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
       getUserSessionService().editUserSession(userSession);
 
-      getMessageSendingService().sendMessage(chatId,
-          "🌤️ You will receive weather forecast notifications for "
-              + requestToDispatch.getUserSession().getCity() + " at " + notificationTime
-              + " every day. Stay updated!🌦️", startMenuKeyboardBuilder.build());
+      String city = userSession.getCity();
+      getMessageSendingService().sendMessage(userSession, "tomorrow.notifications",
+          new String[]{city, notificationTime.toString()}, startMenuKeyboardBuilder.build());
     } else {
-      getMessageSendingService().sendMessage(chatId,
-          "⚠️ Please enter the notification time in `HH:mm` format with `00` minutes.");
+      getMessageSendingService().sendMessage(userSession, "invalid.notification.time");
     }
   }
 
