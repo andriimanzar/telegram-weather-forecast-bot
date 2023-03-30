@@ -8,8 +8,17 @@ import com.manzar.telegramweatherbot.model.UserSession;
 public class UserSessionFactory {
 
   public static UserSession createTestUserSession() {
-    return UserSession.builder().telegramId(1L)
-        .conversationState(ConversationState.CONVERSATION_STARTED).language(Language.EN).unitSystem(
+    return createUserSession(ConversationState.CONVERSATION_STARTED);
+  }
+
+  public static UserSession createUserSessionWithConversationState(
+      ConversationState conversationState) {
+    return createUserSession(conversationState);
+  }
+
+  private static UserSession createUserSession(ConversationState conversationState) {
+    return UserSession.builder().telegramId(1L).city("London")
+        .conversationState(conversationState).language(Language.EN).unitSystem(
             UnitSystem.METRIC).build();
   }
 
