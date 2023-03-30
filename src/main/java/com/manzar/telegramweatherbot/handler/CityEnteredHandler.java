@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * Handles user message, that contains city name.
  */
 @Component
-public class CityEnteredHandler extends AbstractUserRequestHandler {
+public class CityEnteredHandler extends AbstractUserRequestHandler implements UserRequestHandler {
 
   private final CityNameValidator cityNameValidator;
 
