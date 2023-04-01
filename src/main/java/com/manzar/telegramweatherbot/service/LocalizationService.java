@@ -2,6 +2,7 @@ package com.manzar.telegramweatherbot.service;
 
 import com.manzar.telegramweatherbot.model.UserSession;
 import java.util.Locale;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
@@ -55,6 +56,7 @@ public class LocalizationService {
   }
 
   private Locale getLocaleFromSession(UserSession userSession) {
-    return new Locale(userSession.getLanguage().toString());
+    return Optional.ofNullable(userSession.getLanguage()).map(Enum::name)
+        .map(Locale::forLanguageTag).orElse(Locale.ENGLISH);
   }
 }
