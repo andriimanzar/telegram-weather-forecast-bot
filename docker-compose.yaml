@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: 'postgres:10'
+    container_name: 'java_postgres'
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+    restart: always
+    ports:
+      - '5432:5432'
+
+  app:
+    build: ./
+    container_name: 'weather-bot-app'
+    ports:
+      - '8080:8080'
+    environment:
+      - TELEGRAM_BOT_USERNAME=${TELEGRAM_BOT_USERNAME}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+
+      - API_OPEN_WEATHER_MAP_KEY=${API_OPEN_WEATHER_MAP_KEY}
+
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+
+
