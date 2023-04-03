@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.manzar.telegramweatherbot.keyboard.CancelKeyboardBuilder;
 import com.manzar.telegramweatherbot.keyboard.ChangeCityKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
@@ -26,6 +27,8 @@ class ShowForecastHandlerTest {
   private UserSessionService userSessionService;
   @Mock
   private ChangeCityKeyboardBuilder changeCityKeyboardBuilder;
+  @Mock
+  private CancelKeyboardBuilder cancelKeyboardBuilder;
   @InjectMocks
   private ShowForecastHandler showForecastHandler;
 
@@ -39,7 +42,7 @@ class ShowForecastHandlerTest {
     showForecastHandler.handle(userRequest);
 
     verify(messageSendingService, times(1))
-        .sendMessage(userSession, "enter.city");
+        .sendMessage(userSession, "enter.city", cancelKeyboardBuilder.build());
   }
 
   @Test

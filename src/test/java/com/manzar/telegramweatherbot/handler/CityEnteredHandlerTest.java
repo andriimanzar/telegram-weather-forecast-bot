@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.manzar.telegramweatherbot.keyboard.ChangeCityKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
@@ -32,6 +33,8 @@ class CityEnteredHandlerTest {
   private UserSessionService userSessionService;
   @Mock
   private CityNameValidator cityNameValidator;
+  @Mock
+  private ChangeCityKeyboardBuilder changeCityKeyboardBuilder;
   @InjectMocks
   private CityEnteredHandler cityEnteredHandler;
 
@@ -62,7 +65,8 @@ class CityEnteredHandlerTest {
 
     cityEnteredHandler.handle(userRequest);
 
-    verify(messageSendingService, times(1)).sendMessage(userRequest.getUserSession(), "enter.date");
+    verify(messageSendingService, times(1)).sendMessage(userRequest.getUserSession(),
+        "enter.date", changeCityKeyboardBuilder.build());
   }
 
   @Test
