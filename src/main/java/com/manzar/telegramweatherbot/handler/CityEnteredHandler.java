@@ -1,5 +1,6 @@
 package com.manzar.telegramweatherbot.handler;
 
+import com.manzar.telegramweatherbot.keyboard.ChangeCityKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
@@ -16,13 +17,18 @@ import org.springframework.stereotype.Component;
 public class CityEnteredHandler extends AbstractUserRequestHandler implements UserRequestHandler {
 
   private final CityNameValidator cityNameValidator;
+  private final ChangeCityKeyboardBuilder changeCityKeyboardBuilder;
 
+  /**
+   * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
+   * common fields inherited from the parent.
+   */
   public CityEnteredHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService,
-      LocalizationService localizationService,
-      CityNameValidator cityNameValidator) {
+      UserSessionService userSessionService, LocalizationService localizationService,
+      CityNameValidator cityNameValidator, ChangeCityKeyboardBuilder changeCityKeyboardBuilder) {
     super(messageSendingService, userSessionService, localizationService);
     this.cityNameValidator = cityNameValidator;
+    this.changeCityKeyboardBuilder = changeCityKeyboardBuilder;
   }
 
   @Override
@@ -45,7 +51,7 @@ public class CityEnteredHandler extends AbstractUserRequestHandler implements Us
       getUserSessionService().editUserSession(userSession);
 
       getMessageSendingService().sendMessage(userSession,
-          "enter.date");
+          "enter.date", changeCityKeyboardBuilder.build());
     }
   }
 

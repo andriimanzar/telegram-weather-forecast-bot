@@ -1,5 +1,6 @@
 package com.manzar.telegramweatherbot.handler;
 
+import com.manzar.telegramweatherbot.keyboard.CancelKeyboardBuilder;
 import com.manzar.telegramweatherbot.keyboard.ChangeCityKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
@@ -18,13 +19,19 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class ShowForecastHandler extends AbstractUserRequestHandler implements UserRequestHandler {
 
   private final ChangeCityKeyboardBuilder changeCityKeyboardBuilder;
+  private final CancelKeyboardBuilder cancelKeyboardBuilder;
 
+  /**
+   * This constructor calls the constructor of the AbstractUserRequestHandler to initialize the
+   * common fields inherited from the parent.
+   */
   public ShowForecastHandler(MessageSendingService messageSendingService,
-      UserSessionService userSessionService,
-      LocalizationService localizationService,
-      ChangeCityKeyboardBuilder changeCityKeyboardBuilder) {
+      UserSessionService userSessionService, LocalizationService localizationService,
+      ChangeCityKeyboardBuilder changeCityKeyboardBuilder,
+      CancelKeyboardBuilder cancelKeyboardBuilder) {
     super(messageSendingService, userSessionService, localizationService);
     this.changeCityKeyboardBuilder = changeCityKeyboardBuilder;
+    this.cancelKeyboardBuilder = cancelKeyboardBuilder;
   }
 
   @Override
@@ -41,7 +48,7 @@ public class ShowForecastHandler extends AbstractUserRequestHandler implements U
 
     if (requestToDispatch.getUserSession().getCity() == null) {
       getMessageSendingService().sendMessage(sessionToUpdate,
-          "enter.city");
+          "enter.city", cancelKeyboardBuilder.build());
       sessionToUpdate.setConversationState(ConversationState.WAITING_FOR_CITY);
     } else {
       getMessageSendingService().sendMessage(sessionToUpdate,
