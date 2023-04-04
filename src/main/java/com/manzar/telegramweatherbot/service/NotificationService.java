@@ -8,7 +8,6 @@ import com.manzar.telegramweatherbot.util.DateUtils;
 import com.manzar.telegramweatherbot.util.TimeUtils;
 import jakarta.transaction.Transactional;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -103,10 +102,9 @@ public class NotificationService {
     Notification notification;
 
     if (notificationTime.isPresent()) {
-      LocalTime truncatedNotificationTime = notificationTime.get().truncatedTo(ChronoUnit.HOURS);
       notification = Notification.builder().userSession(userSession)
           .chatId(userSession.getTelegramId())
-          .notificationType(notificationType).notificationTime(truncatedNotificationTime)
+          .notificationType(notificationType).notificationTime(notificationTime.get())
           .build();
     } else {
       notification = Notification.builder().userSession(userSession)
