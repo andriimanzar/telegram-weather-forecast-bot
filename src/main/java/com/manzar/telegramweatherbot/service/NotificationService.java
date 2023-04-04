@@ -8,7 +8,9 @@ import com.manzar.telegramweatherbot.util.DateUtils;
 import com.manzar.telegramweatherbot.util.TimeUtils;
 import jakarta.transaction.Transactional;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -29,13 +31,21 @@ public class NotificationService {
    * chat ID.
    *
    * @param userSession the user session for which the notifications are being created
-   * @param chatId      the chat ID associated with the user session
    */
-  public void createMorningAndAfternoonNotification(UserSession userSession, Long chatId) {
-    createNotification(userSession, chatId, NotificationType.MORNING_AND_AFTERNOON,
-        Optional.of(LocalTime.of(7, 0)));
-    createNotification(userSession, chatId, NotificationType.MORNING_AND_AFTERNOON,
-        Optional.of(LocalTime.of(14, 0)));
+  public boolean createMorningAndAfternoonNotification(UserSession userSession) {
+    List<Notification> morningAndAfternoonUserNotifications =
+        notificationRepository.findAllByUserSessionAndNotificationType(userSession,
+            NotificationType.MORNING_AND_AFTERNOON);
+
+    if (morningAndAfternoonUserNotifications.isEmpty()) {
+      createNotification(userSession, NotificationType.MORNING_AND_AFTERNOON,
+          Optional.of(LocalTime.of(7, 0)));
+      createNotification(userSession, NotificationType.MORNING_AND_AFTERNOON,
+          Optional.of(LocalTime.of(15, 0)));
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -43,13 +53,22 @@ public class NotificationService {
    * time.
    *
    * @param userSession      the user session for which the notifications are being created
-   * @param chatId           the chat ID associated with the user session
    * @param notificationTime the time, at which the notification will trigger
    */
-  public void createTomorrowNotification(UserSession userSession, Long chatId,
+  public boolean createTomorrowNotification(UserSession userSession,
       Optional<LocalTime> notificationTime) {
-    createNotification(userSession, chatId, NotificationType.TOMORROW,
-        notificationTime);
+    List<Notification> allUserNotificationsForTomorrow =
+        notificationRepository.findAllByUserSessionAndNotificationType(
+            userSession, NotificationType.TOMORROW);
+
+    if (allUserNotificationsForTomorrow.isEmpty() || notificationTime.isEmpty()) {
+      createNotification(userSession, NotificationType.TOMORROW,
+          notificationTime);
+      return true;
+    } else {
+      return createTomorrowNotificationIfOtherNotificationsExistsAndTimeIsPresent(userSession,
+          allUserNotificationsForTomorrow, notificationTime);
+    }
   }
 
   @Transactional
@@ -58,11 +77,13 @@ public class NotificationService {
   }
 
   /**
-   * A method to send notifications to the users on an hourly schedule.
+   * Sends notifications to the users on an hourly schedule.
    */
   @Scheduled(cron = "@hourly")
   public void sendAllNotifications() {
-    notificationRepository.findAll().stream().filter(TimeUtils::notificationTimeEqualsCurrent)
+    notificationRepository.findAll().stream()
+        .filter(notification -> notification.getNotificationTime() != null)
+        .filter(TimeUtils::notificationTimeEqualsCurrent)
         .forEach(this::sendNotification);
   }
 
@@ -76,11 +97,13 @@ public class NotificationService {
     messageSendingService.sendMessage(userSession, formattedForecast);
   }
 
-  private void createNotification(UserSession userSession, Long chatId,
+  private void createNotification(UserSession userSession,
       NotificationType notificationType, Optional<LocalTime> notificationTime) {
     Notification notification;
+
     if (notificationTime.isPresent()) {
-      notification = Notification.builder().userSession(userSession).chatId(chatId)
+      notification = Notification.builder().userSession(userSession)
+          .chatId(userSession.getTelegramId())
           .notificationType(notificationType).notificationTime(notificationTime.get())
           .build();
     } else {
@@ -88,6 +111,23 @@ public class NotificationService {
           .notificationType(notificationType).build();
     }
     notificationRepository.save(notification);
+  }
+
+  private boolean createTomorrowNotificationIfOtherNotificationsExistsAndTimeIsPresent(
+      UserSession userSession, List<Notification> allUserNotificationsForTomorrow,
+      Optional<LocalTime> notificationTime) {
+    Predicate<Notification> notificationTimeEqualsGiven =
+        notification -> notification.getNotificationTime().equals(notificationTime.get());
+    boolean notificationWithSameTimeExists = allUserNotificationsForTomorrow.stream()
+        .filter(notification -> notification.getNotificationTime() != null)
+        .anyMatch(notificationTimeEqualsGiven);
+
+    if (notificationWithSameTimeExists) {
+      return false;
+    } else {
+      createNotification(userSession, NotificationType.TOMORROW, notificationTime);
+      return true;
+    }
   }
 }
 

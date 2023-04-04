@@ -51,32 +51,18 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
     Update update = requestToDispatch.getUpdate();
     String chosenOption = UpdateParser.getText(update);
     UserSession userSession = requestToDispatch.getUserSession();
-    Long chatId = requestToDispatch.getChatId();
 
     if (getLocalizationService().localizedButtonLabelEqualsGivenText(userSession, chosenOption,
         "tomorrow.type")) {
-      notificationService.createTomorrowNotification(userSession, chatId, Optional.empty());
-
-      userSession.setConversationState(ConversationState.WAITING_FOR_NOTIFICATION_TIME);
-      getUserSessionService().editUserSession(userSession);
-
-      getMessageSendingService().sendMessage(userSession, "notification.time",
-          notificationTimeKeyboardBuilder.build());
-
+      setTomorrowNotificationWithoutTime(userSession);
     } else if (getLocalizationService().localizedButtonLabelEqualsGivenText(userSession,
         chosenOption, "morning.and.afternoon.type")) {
-      notificationService.createMorningAndAfternoonNotification(userSession, chatId);
-
-      userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
-      getUserSessionService().editUserSession(userSession);
-
-      String city = userSession.getCity();
-      getMessageSendingService().sendMessage(userSession, "morning.and.afternoon.notifications",
-          new String[]{city}, startMenuKeyboardBuilder.build());
+      setMorningAndAfternoonNotifications(userSession);
 
     } else if (getLocalizationService().localizedButtonLabelEqualsGivenText(userSession,
         chosenOption, "unfollow.notifications")) {
       notificationService.deleteNotifications(userSession.getTelegramId());
+
       getMessageSendingService().sendMessage(userSession, "notifications.unfollowed");
     }
   }
@@ -84,5 +70,32 @@ public class NotificationTypeHandler extends AbstractUserRequestHandler implemen
   @Override
   public boolean isGlobal() {
     return false;
+  }
+
+  private void setTomorrowNotificationWithoutTime(UserSession userSession) {
+    notificationService.createTomorrowNotification(userSession, Optional.empty());
+
+    userSession.setConversationState(ConversationState.WAITING_FOR_NOTIFICATION_TIME);
+    getUserSessionService().editUserSession(userSession);
+
+    getMessageSendingService().sendMessage(userSession, "notification.time",
+        notificationTimeKeyboardBuilder.build());
+  }
+
+  private void setMorningAndAfternoonNotifications(UserSession userSession) {
+    boolean notificationCreated = notificationService.createMorningAndAfternoonNotification(
+        userSession);
+
+    if (notificationCreated) {
+      userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
+      getUserSessionService().editUserSession(userSession);
+
+      String city = userSession.getCity();
+      getMessageSendingService().sendMessage(userSession, "morning.and.afternoon.notifications",
+          new String[]{city}, startMenuKeyboardBuilder.build());
+    } else {
+      getMessageSendingService().sendMessage(userSession,
+          "morning.and.afternoon.notifications.exists");
+    }
   }
 }

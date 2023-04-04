@@ -97,7 +97,7 @@ class NotificationTypeHandlerTest {
     notificationTypeHandler.handle(userRequest);
 
     verify(notificationService, times(1)).createTomorrowNotification(userSession,
-        userRequest.getChatId(), Optional.empty());
+        Optional.empty());
   }
 
   @Test
@@ -116,6 +116,8 @@ class NotificationTypeHandlerTest {
         morningAndAfternoonButton,
         "morning.and.afternoon.type"))
         .thenReturn(true);
+    when(notificationService.createMorningAndAfternoonNotification(userSession
+    )).thenReturn(true);
 
     notificationTypeHandler.handle(userRequest);
 
@@ -139,6 +141,7 @@ class NotificationTypeHandlerTest {
         morningAndAfternoonButton,
         "morning.and.afternoon.type"))
         .thenReturn(true);
+    when(notificationService.createMorningAndAfternoonNotification(userSession)).thenReturn(true);
 
     notificationTypeHandler.handle(userRequest);
 
@@ -165,8 +168,31 @@ class NotificationTypeHandlerTest {
 
     notificationTypeHandler.handle(userRequest);
 
-    verify(notificationService, times(1)).createMorningAndAfternoonNotification(userSession,
-        userRequest.getChatId());
+    verify(notificationService, times(1)).createMorningAndAfternoonNotification(userSession);
+  }
+
+  @Test
+  void handleSendsMessageAboutMorningAndAfternoonNotificationsExistsIfNotificationsAlreadyExists() {
+    String morningAndAfternoonButton = "️☑️ Morning and afternoon";
+    UserRequest userRequest = UserRequestFactory.createRequestWithStateAndText(
+        ConversationState.WAITING_FOR_NOTIFICATION_TIME, morningAndAfternoonButton);
+    UserSession userSession = userRequest.getUserSession();
+
+    when(localizationService.localizedButtonLabelEqualsGivenText(userSession,
+        morningAndAfternoonButton,
+        "tomorrow.type"))
+        .thenReturn(false);
+    when(localizationService.localizedButtonLabelEqualsGivenText(userSession,
+        morningAndAfternoonButton,
+        "morning.and.afternoon.type"))
+        .thenReturn(true);
+    when(notificationService.createMorningAndAfternoonNotification(userSession
+    )).thenReturn(false);
+
+    notificationTypeHandler.handle(userRequest);
+
+    verify(messageSendingService, times(1))
+        .sendMessage(userSession, "morning.and.afternoon.notifications.exists");
   }
 
   @Test

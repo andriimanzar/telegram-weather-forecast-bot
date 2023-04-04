@@ -55,14 +55,14 @@ class NotificationServiceTest {
   @Test
   void createMorningAndAfternoonNotificationCallsRepositorySaveTwoTimes() {
     notificationService.createMorningAndAfternoonNotification(
-        createTestUserSession(), 1L);
+        createTestUserSession());
 
     verify(notificationRepository, times(2)).save(any(Notification.class));
   }
 
   @Test
   void createTomorrowNotificationCallsRepositorySave() {
-    notificationService.createTomorrowNotification(createTestUserSession(), 1L,
+    notificationService.createTomorrowNotification(createTestUserSession(),
         Optional.of(LocalTime.of(15, 0)));
 
     verify(notificationRepository, times(1)).save(any(Notification.class));
