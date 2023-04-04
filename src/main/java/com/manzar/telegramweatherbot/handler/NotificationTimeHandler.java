@@ -48,19 +48,10 @@ public class NotificationTimeHandler extends AbstractUserRequestHandler implemen
   public void handle(UserRequest requestToDispatch) {
     Update update = requestToDispatch.getUpdate();
     UserSession userSession = requestToDispatch.getUserSession();
-    Long chatId = requestToDispatch.getChatId();
-
     String notificationTimeToParse = UpdateParser.getText(update);
-    if (TimeUtils.isValid(notificationTimeToParse)) {
-      LocalTime notificationTime = LocalTime.parse(notificationTimeToParse);
-      notificationService.createTomorrowNotification(userSession, chatId,
-          Optional.of(notificationTime));
-      userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
-      getUserSessionService().editUserSession(userSession);
 
-      String city = userSession.getCity();
-      getMessageSendingService().sendMessage(userSession, "tomorrow.notifications",
-          new String[]{city, notificationTime.toString()}, startMenuKeyboardBuilder.build());
+    if (TimeUtils.isValid(notificationTimeToParse)) {
+      setTomorrowNotification(userSession, notificationTimeToParse);
     } else {
       getMessageSendingService().sendMessage(userSession, "invalid.notification.time");
     }
@@ -69,5 +60,25 @@ public class NotificationTimeHandler extends AbstractUserRequestHandler implemen
   @Override
   public boolean isGlobal() {
     return false;
+  }
+
+  private void setTomorrowNotification(UserSession userSession,
+      String notificationTimeToParse) {
+    LocalTime notificationTime = LocalTime.parse(notificationTimeToParse);
+
+    boolean notificationCreated = notificationService.createTomorrowNotification(userSession,
+        Optional.of(notificationTime));
+
+    if (notificationCreated) {
+      userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
+      getUserSessionService().editUserSession(userSession);
+
+      String[] params = new String[]{userSession.getCity(), notificationTime.toString()};
+      getMessageSendingService().sendMessage(userSession, "tomorrow.notifications",
+          params, startMenuKeyboardBuilder.build());
+    } else {
+      getMessageSendingService().sendMessage(userSession,
+          "tomorrow.notification.with.same.time.exists");
+    }
   }
 }
