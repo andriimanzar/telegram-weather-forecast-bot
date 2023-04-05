@@ -7,6 +7,7 @@ import com.manzar.telegramweatherbot.keyboard.SettingsKeyboardBuilder;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.service.MessageSendingService;
+import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.service.factory.UserRequestFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,8 @@ class SettingsHandlerTest {
   private MessageSendingService messageSendingService;
   @Mock
   private SettingsKeyboardBuilder settingsKeyboardBuilder;
+  @Mock
+  private UserSessionService userSessionService;
   @InjectMocks
   private SettingsHandler settingsHandler;
 

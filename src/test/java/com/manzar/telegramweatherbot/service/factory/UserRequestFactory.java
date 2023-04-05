@@ -5,6 +5,7 @@ import com.manzar.telegramweatherbot.model.UserRequest;
 import com.manzar.telegramweatherbot.model.UserSession;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 public class UserRequestFactory {
 
@@ -16,8 +17,14 @@ public class UserRequestFactory {
       String text) {
     UserSession userSession = UserSessionFactory.createUserSessionWithConversationState(
         conversationState);
+
+    User user = new User();
+    user.setId(1L);
+
     Message message = new Message();
     message.setText(text);
+    message.setFrom(user);
+
     Update update = new Update();
     update.setMessage(message);
     return UserRequestFactory.createUserRequest(update, userSession);
