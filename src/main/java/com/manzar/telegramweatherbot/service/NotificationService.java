@@ -22,9 +22,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationService {
 
-  private final WeatherService weatherService;
   private final NotificationRepository notificationRepository;
   private final MessageSendingService messageSendingService;
+  private final WeatherService weatherService;
 
   /**
    * Creates a morning and afternoon weather forecast notification for the given user session and
@@ -90,7 +90,7 @@ public class NotificationService {
 
   private void sendNotification(Notification notification) {
     UserSession userSession = notification.getUserSession();
-    String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(
+    String formattedForecast = weatherService.getWeatherForecastByUserSessionAndDate(
         userSession,
         DateUtils.calculateForecastDate(notification.getNotificationType()));
 

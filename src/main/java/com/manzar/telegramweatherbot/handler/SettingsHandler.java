@@ -35,6 +35,9 @@ public class SettingsHandler extends AbstractUserRequestHandler implements UserR
 
   @Override
   public void handle(UserRequest requestToDispatch) {
+    getUserSessionService().createUserSessionIfNotExists(
+        UpdateParser.getTelegramId(requestToDispatch.getUpdate()));
+
     getMessageSendingService().sendMessage(requestToDispatch.getUserSession(),
         "settings", settingsKeyboardBuilder.build());
   }

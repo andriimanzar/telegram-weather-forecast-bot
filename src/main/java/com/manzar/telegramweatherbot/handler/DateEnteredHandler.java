@@ -54,7 +54,7 @@ public class DateEnteredHandler extends AbstractUserRequestHandler implements Us
       userSession.setConversationState(ConversationState.CONVERSATION_STARTED);
       getUserSessionService().editUserSession(userSession);
 
-      String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(userSession,
+      String formattedForecast = weatherService.getWeatherForecastByUserSessionAndDate(userSession,
           DateUtils.parse(date));
       getMessageSendingService().sendMessage(userSession, formattedForecast,
           startMenuKeyboardBuilder.build());

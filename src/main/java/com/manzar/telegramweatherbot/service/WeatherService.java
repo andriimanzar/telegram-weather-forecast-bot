@@ -28,7 +28,7 @@ public class WeatherService {
    * @param requestedDay the date to retrieve the forecast for
    * @return a String formatted forecast
    */
-  public String getWeatherForecastByCityNameAndDate(UserSession userSession,
+  public String getWeatherForecastByUserSessionAndDate(UserSession userSession,
       LocalDate requestedDay) {
     Forecast forecastForFiveDays = openWeatherMapClient.forecast5Day3HourStep().byCityName(
         userSession.getCity()).unitSystem(userSession.getUnitSystem()).retrieve().asJava();
