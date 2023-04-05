@@ -68,7 +68,7 @@ public class ForecastFormatter {
   }
 
   private void appendClouds(WeatherForecast weatherForecast, StringBuilder stringBuilder) {
-    stringBuilder.append("☁️- ").append(weatherForecast.getClouds().getValue())
+    stringBuilder.append("☁️ - ").append(weatherForecast.getClouds().getValue())
         .append(weatherForecast.getClouds().getUnit()).append(", ");
   }
 

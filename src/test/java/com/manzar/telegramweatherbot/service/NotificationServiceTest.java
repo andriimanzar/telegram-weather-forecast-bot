@@ -92,10 +92,10 @@ class NotificationServiceTest {
     setValidTime();
     notificationService.sendAllNotifications();
 
-    verify(weatherService, times(1)).getWeatherForecastByCityNameAndDate(
+    verify(weatherService, times(1)).getWeatherForecastByUserSessionAndDate(
         createTestUserSession(),
         LocalDate.now());
-    verify(weatherService, times(1)).getWeatherForecastByCityNameAndDate(createTestUserSession(),
+    verify(weatherService, times(1)).getWeatherForecastByUserSessionAndDate(createTestUserSession(),
         LocalDate.now().plusDays(1));
 
     localTimeMock.clearInvocations();
