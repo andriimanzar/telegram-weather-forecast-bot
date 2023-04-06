@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: 'postgres:10'
-    container_name: 'java_postgres'
+    container_name: 'postgres'
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -27,5 +27,7 @@ services:
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+
+      - DEFAULT_TIMEZONE=${DEFAULT_TIMEZONE}
 
 

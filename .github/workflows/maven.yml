@@ -17,6 +17,7 @@ jobs:
       SPRING_DATASOURCE_URL: ${{secrets.SPRING_DATASOURCE_URL}}
       SPRING_DATASOURCE_USERNAME: ${{secrets.SPRING_DATASOURCE_USERNAME}}
       SPRING_DATASOURCE_PASSWORD: ${{secrets.SPRING_DATASOURCE_PASSWORD}}
+      DEFAULT_TIMEZONE: ${{secrets.DEFAULT_TIMEZONE}}
 
     steps:
       - uses: actions/checkout@v3
