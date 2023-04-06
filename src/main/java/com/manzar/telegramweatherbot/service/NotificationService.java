@@ -12,19 +12,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
  * A service for managing notifications for a user.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
 
-  private final WeatherService weatherService;
   private final NotificationRepository notificationRepository;
   private final MessageSendingService messageSendingService;
+  private final WeatherService weatherService;
 
   /**
    * Creates a morning and afternoon weather forecast notification for the given user session and
@@ -85,12 +87,13 @@ public class NotificationService {
         .filter(notification -> notification.getNotificationTime() != null)
         .filter(TimeUtils::notificationTimeEqualsCurrent)
         .forEach(this::sendNotification);
+    log.info("Sending notifications");
   }
 
 
   private void sendNotification(Notification notification) {
     UserSession userSession = notification.getUserSession();
-    String formattedForecast = weatherService.getWeatherForecastByCityNameAndDate(
+    String formattedForecast = weatherService.getWeatherForecastByUserSessionAndDate(
         userSession,
         DateUtils.calculateForecastDate(notification.getNotificationType()));
 
@@ -130,4 +133,3 @@ public class NotificationService {
     }
   }
 }
-

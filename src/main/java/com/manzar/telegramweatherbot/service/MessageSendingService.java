@@ -1,9 +1,9 @@
 package com.manzar.telegramweatherbot.service;
 
-import com.manzar.telegramweatherbot.exception.MessageSendingException;
 import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.sender.WeatherBotSender;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 /**
  * Service, that performs message sending from bot to user.
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MessageSendingService {
@@ -69,7 +70,7 @@ public class MessageSendingService {
     try {
       weatherBotSender.execute(sendMessage);
     } catch (TelegramApiException e) {
-      throw new MessageSendingException("Cannot send message");
+      log.error("Cannot send message", e);
     }
   }
 }
