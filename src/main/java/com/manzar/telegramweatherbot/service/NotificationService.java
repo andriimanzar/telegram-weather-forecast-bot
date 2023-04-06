@@ -12,12 +12,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
  * A service for managing notifications for a user.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -85,6 +87,7 @@ public class NotificationService {
         .filter(notification -> notification.getNotificationTime() != null)
         .filter(TimeUtils::notificationTimeEqualsCurrent)
         .forEach(this::sendNotification);
+    log.info("Sending notifications");
   }
 
 
@@ -130,4 +133,3 @@ public class NotificationService {
     }
   }
 }
-

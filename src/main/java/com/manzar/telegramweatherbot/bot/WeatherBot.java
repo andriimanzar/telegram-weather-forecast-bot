@@ -1,7 +1,5 @@
 package com.manzar.telegramweatherbot.bot;
 
-import com.manzar.telegramweatherbot.exception.BotRegistrationException;
-import com.manzar.telegramweatherbot.exception.UnexpectedUpdateException;
 import com.manzar.telegramweatherbot.handler.DispatcherHandler;
 import com.manzar.telegramweatherbot.model.ConversationState;
 import com.manzar.telegramweatherbot.model.UserRequest;
@@ -10,6 +8,7 @@ import com.manzar.telegramweatherbot.service.UserSessionService;
 import com.manzar.telegramweatherbot.util.UpdateParser;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -21,6 +20,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 /**
  * Class, that represents bot. Contains methods to configure register and configure bot.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class WeatherBot extends TelegramLongPollingBot {
@@ -34,9 +34,8 @@ public class WeatherBot extends TelegramLongPollingBot {
   private final UserSessionService userSessionService;
 
   /**
-   * Method, that will be called after creation bean for this class.
+   * Registers bot after bean creation.
    *
-   * @throws BotRegistrationException in case bot registration was failed.
    */
   @PostConstruct
   public void init() {
@@ -44,7 +43,7 @@ public class WeatherBot extends TelegramLongPollingBot {
       TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
       telegramBotsApi.registerBot(this);
     } catch (TelegramApiException e) {
-      throw new BotRegistrationException("Cannot register bot", e);
+      log.error("Cannot register bot", e);
     }
   }
 
@@ -66,7 +65,7 @@ public class WeatherBot extends TelegramLongPollingBot {
     boolean dispatched = dispatcherHandler.dispatch(userRequest);
 
     if (!dispatched) {
-      throw new UnexpectedUpdateException("Unexpected update!");
+      log.error("Unexpected update");
     }
   }
 

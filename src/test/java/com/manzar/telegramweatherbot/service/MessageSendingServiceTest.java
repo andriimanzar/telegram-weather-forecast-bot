@@ -1,14 +1,11 @@
 package com.manzar.telegramweatherbot.service;
 
 import static com.manzar.telegramweatherbot.service.factory.UserSessionFactory.createTestUserSession;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.manzar.telegramweatherbot.exception.MessageSendingException;
 import com.manzar.telegramweatherbot.model.UserSession;
 import com.manzar.telegramweatherbot.sender.WeatherBotSender;
 import java.util.ArrayList;
@@ -44,18 +41,5 @@ class MessageSendingServiceTest {
 
     verify(weatherBotSender,
         times(1)).execute(any(SendMessage.class));
-  }
-
-  @Test
-  void sendMessageThrowsAnExceptionIfMessageIsNotSent() throws TelegramApiException {
-    UserSession userSession = createTestUserSession();
-
-    doThrow(TelegramApiException.class).when(weatherBotSender).execute(any(SendMessage.class));
-    when(localizationService.localizeMessage(userSession, "test",
-        null)).thenReturn("test");
-
-    assertThrows(MessageSendingException.class, () ->
-        messageSendingService.sendMessage(userSession, "test",
-            new ReplyKeyboardMarkup(new ArrayList<>())));
   }
 }
