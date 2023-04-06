@@ -1,6 +1,8 @@
 package com.manzar.telegramweatherbot.config;
 
 import com.github.prominence.openweathermap.api.OpenWeatherMapClient;
+import jakarta.annotation.PostConstruct;
+import java.util.TimeZone;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -20,14 +22,22 @@ import org.springframework.web.client.RestTemplate;
 @EnableScheduling
 public class AppConfig {
 
+  @Value("${default.timezone}")
+  private String defaultTimeZone;
+
   @Value("${api.openweathermap.key}")
   private String weatherMapApiKey;
+
+  @PostConstruct
+  void started() {
+    TimeZone defaultZone = TimeZone.getTimeZone(defaultTimeZone);
+    TimeZone.setDefault(defaultZone);
+  }
 
   @Bean
   public OpenWeatherMapClient openWeatherMapClient() {
     return new OpenWeatherMapClient(weatherMapApiKey);
   }
-
 
   /**
    * Creates RestTemplate bean without error handler.
@@ -45,7 +55,6 @@ public class AppConfig {
 
   /**
    * Creates MessageSource bean to read messages from resource bundle with UTF-8 encoding.
-   *
    */
   @Bean
   public MessageSource messageSource() {
