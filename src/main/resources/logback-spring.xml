@@ -1,0 +1,28 @@
+<configuration>
+
+  <property name="HOME_LOG" value="logs/app.log"/>
+
+  <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${HOME_LOG}</file>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+      <maxFileSize>10MB</maxFileSize>
+      <totalSizeCap>20GB</totalSizeCap>
+      <maxHistory>60</maxHistory>
+    </rollingPolicy>
+
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %-4relative %-5level %logger{35} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="com.manzar.telegramweatherbot" level="debug" additivity="false">
+    <appender-ref ref="FILE-ROLLING"/>
+  </logger>
+
+  <root level="error">
+    <appender-ref ref="FILE-ROLLING"/>
+  </root>
+
+</configuration>
