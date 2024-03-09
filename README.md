@@ -54,6 +54,6 @@ If you are making changes to the code:
 Project is: _complete_
 
 ## Contact
-Created by [@andrew21812]([https://t.me/andrew21812) - feel free to contact me in Telegram!
+Created by [@andrew21812](https://t.me/andrew21812) - feel free to contact me in Telegram!
 
 
